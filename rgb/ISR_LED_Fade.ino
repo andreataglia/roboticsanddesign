@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <math.h>
 
 #define REDPIN 11
 #define GREENPIN 10
@@ -8,39 +9,42 @@
 #define TIMESTEP 50
 #define N 6
 #define RGB 3
+#define THRESH 4
 
 /* ---- COLOR VARIABLES ----*/
 byte currentColor[RGB] = {0,0,0};
 byte colors[N][RGB] = {
-  {0, 0, 0},
-  {255, 255, 255},
-  {0, 0, 0},
-  {180, 20, 100},
-  {120, 120, 0},
-  {0, 255, 225}
+  {0, 255, 0},
+  {0, 255, 255},
+  {0, 255, 120},
+  {0, 190, 255},
+  {130, 255, 0},
+  {0, 255, 255}
 };
 byte difference[N][RGB];
 byte startColorIndex, endColorIndex;
-int fadeTime[N] = {3000,3000,3000,3000,3000,3000};
+int fadeTime[N] = {1000,1000,1000,1000,1000,1000};
 
 /* ---- CONTROL VARIABLES ----*/
-byte i, j;
+byte i, j, dif, flag;
 unsigned long int nexttime = 0;
 
 
 void calcDifference(){
   for(i=0; i<N-1; i++){
     for(j=0; j<RGB; j++){
-      difference[i][j] = (abs(colors[i][j] - colors[i+1][j]) * TIMESTEP) / fadeTime[i];
+      difference[i][j] = round((abs((int)colors[i][j] - (int)colors[i+1][j]) * (int)TIMESTEP) / fadeTime[i]);
       Serial.print(difference[i][j]);
+      Serial.print(',');
     }
     Serial.println(' ');
   }
   
   for(j=0; j<RGB; j++){
-    difference[i][j] = (abs(colors[i][j] - colors[0][j]) * TIMESTEP) / fadeTime[i];
-    Serial.println(difference[i][j]);
+    difference[i][j] = round((abs((int)colors[i][j] - (int)colors[0][j]) * TIMESTEP) / fadeTime[i]);
+    Serial.print(difference[i][j]);
   }
+  Serial.println(' ');
   Serial.println("---\n");
 }
 
@@ -64,23 +68,32 @@ ISR(TIMER2_OVF_vect){
         currentColor[j] -= difference[startColorIndex][j];
     }
 
-    //go to next color after fading transition finished
-    if(abs(currentColor[0] - colors[endColorIndex][0]) < 5 || abs(currentColor[1] - colors[endColorIndex][1]) < 5  || abs(currentColor[2] - colors[endColorIndex][2]) < 5){
+    //check if this fading transition has finished finished
+    for(j=0, flag = 0; j<RGB; j++){
+      dif = abs(currentColor[j] - colors[endColorIndex][j]);
+      if(dif>0 && dif<THRESH)
+        flag=1;
+    }
+    if(flag){  
+      startColorIndex++;
+      for(j=0; j<RGB; j++){
+        currentColor[j] = colors[startColorIndex][j];
+      }
+      endColorIndex++;
       
+      if(endColorIndex == N)
+        endColorIndex=0;
+      if(startColorIndex == N)
+        startColorIndex=0;
+
       Serial.print("change ");
       Serial.print(startColorIndex);
       Serial.println(endColorIndex);
-      startColorIndex++;
-      endColorIndex++;
-      
-      if(endColorIndex > N)
-        endColorIndex=0;
-      if(startColorIndex > N)
-        startColorIndex=0;
     } 
     nexttime = millis() + TIMESTEP;
   }
 }
+
 
 void setup(){
   // put your setup code here, to run once:
