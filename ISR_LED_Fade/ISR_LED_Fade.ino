@@ -8,100 +8,132 @@
 
 //Time in milliseconds LED stays fixed on a RGB value during "Color fading"
 #define TIMESTEP 50
-#define EXPRESSIONS 6
+#define EXPRESSIONS 7
 //Hardcoded emotion color matrix row dimension
-#define NUMCOLOR 26
+#define NUMCOLOR 33
 #define RGB 3
-//Color fading transition Threshold in order to change from a color to an other
-#define THRESH 4
 
-/* ---- COLOR VARIABLES ----*/
+          /////////////////////////
+          //--Constant Emotions--//
+          /////////////////////////
+
+const char neutral = 1;
+const char activation = 2;
+const char joy = 3;
+const char fear = 4;
+const char angry= 5;
+const char sad = 6;
+const char disgust= 7;
+
+
+          /////////////////////////
+          //---Color Variables---//
+          /////////////////////////
+
+          
 byte currentColor[RGB] = {0,0,0};
-byte crntExprIdx;
+byte exprIdx;
 
 /**
-* All the colors for all the emotion transitions are hardcoded in matrix
-* Colors are represented by the 3 byte values of Red, Green, Blue
-*/
+ * All the colors for all the emotion transitions are hardcoded in matrix
+ * Colors are represented by the 3 byte values of Red, Green, Blue 
+ */
 byte colors[NUMCOLOR][RGB] = {
   //Activation
-  {60,60,60},
-  {255,255,255},
-  //JOY index=2
-  {0, 255, 0},
-  {0, 255, 255},
-  {0, 255, 120},
-  {0, 190, 255},
-  {130, 255, 0},
-  {0, 255, 255},
-  {0, 255, 120},
-  {0, 255, 255},
-  {130, 255, 0},
-  //FEAR index=11
-  {80,0,100},
-  {160,0,255},
-  {100,0,150},
-  {255,0,255},
-  //ANGER index=15
-  {255,0,0},
-  {80,40,0},
-  {255,0,0},
-  {150,20,20},
-  //SADNESS index=19
-  {64,64,255},
-  {150,170,225},
-  {70,100,190},
-  {0,40,120},
-  {150,170,225},
-  //DISGUST index=24
-  {30,90,50},
-  {70,170,115},
+  {60,60,60},//0
+  {255,255,255},//1
+  //JOY
+  {0, 255, 0},//2
+  {0, 255, 255},//3
+  {0, 255, 120},//4
+  {0, 190, 255},//5
+  {130, 255, 0},//6
+  {0, 255, 255},//7
+  {0, 255, 120},//8
+  {0, 255, 255},//9
+  {130, 255, 0},//10
+  //FEAR
+  {80,0,100},//11
+  {160,0,255},//12
+  {100,0,150},//13
+  {255,0,255},//14
+  //ANGER
+  {255,0,0},//15
+  {80,40,0},//16
+  {255,0,0},//17
+  {150,20,20},//18
+  //SADNESS
+  {64,64,255},//19
+  {150,170,225},//20
+  {70,100,190},//21
+  {0,40,120},//22
+  {150,170,225},//23
+  //DISGUST
+  {30,90,50},//24
+  {70,170,115},//25
+  //NEUTRAL
+  {240,240,240},//26
+  {80,80,80},//27
+  {80,80,80},//28
+  {0,0,0},//29
+  {0,0,0},//30
+  {80,80,80},//31
+  {80,80,80},//32
 };
 int fadeTime[NUMCOLOR] = {
-  //Activation
+  //Activation index=0
   1000, 1000,
-  //JOY index=
+  //JOY index=2
   1000,1000,1000,1000,1000,1000,1000,1000,1000,
-  //FEAR index=
+  //FEAR index=11
   1000,2000,1500,1000,
-  //ANGER index=
+  //ANGER index=15
   1500,2500,1500,3000,
-  //SADNESS index=
+  //SADNESS index=19
   1000,1500,2000,1000,1500,
-  //DISGUST index=
-  2500,1000
+  //DISGUST index=24
+  2500,1000,
+  //NEUTRAL index=26
+  5000,1000,1500,3000,1000,1500,3000
 };
 
-/** 
-* Emotion orientation in terms of starting and ending color will be provided by external indexes representing matrix row.
-* Those indexes will be set by the SetEmotion() function.
-*/
-byte exprIdxStart[EXPRESSIONS]={0,2,11,15,19,24};
-byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25};
-
 /**
-* In order to easilly change the colors of the individual transitions, this matrix stores all the RGB-step from a color to the next.
-* The RGB-step depends on RGB Source and Destination, individual transition time-to-fade, constant TimeStep.
-*/
+ * Emotion orientation in terms of starting and ending color will be provided by external indexes representing matrix row.
+ * Those indexes will be set by the SetEmotion() function.
+ */
+byte exprIdxStart[EXPRESSIONS]={0,2,11,15,19,24,26};
+byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25,32};
+/**
+ * In order to easilly change the colors of the individual transitions, this matrix stores all the RGB-step from a color to the next.
+ * The RGB-step depends on RGB Source and Destination, individual transition time-to-fade, constant TimeStep.
+ */
 byte difference[NUMCOLOR][RGB];
 byte strtTransitionIdx, endTransitionIdx;
 
 
-/* ---- CONTROL VARIABLES ----*/
+          ///////////////////////////
+          //---Control Variables---//
+          ///////////////////////////
 byte i, j, k, dif, flag;
 unsigned long int nexttime = 50;
 
 
+/**
+ * 
+ * 
+ */
 ISR(TIMER2_OVF_vect){
   if (millis() > nexttime) {
+    //disable Global interrupt in order to prevent other ISR
     cli();
-    Serial.print(currentColor[0]);
-    Serial.print(", ");
-    Serial.print(currentColor[1]);
-    Serial.print(", ");
-    Serial.println(currentColor[2]);
-    Serial.flush();
-    //write del colore dato in precedenza contenuto in un array
+//    Serial.print(currentColor[0]);
+//    Serial.print(", ");
+//    Serial.print(currentColor[1]);
+//    Serial.print(", ");
+//    Serial.println(currentColor[2]);
+//    Serial.flush();
+    
+    //RGB write from the previous color
     analogWrite(REDPIN, currentColor[0]);
     analogWrite(GREENPIN, currentColor[1]);
     analogWrite(BLUEPIN, currentColor[2]);
@@ -116,29 +148,31 @@ ISR(TIMER2_OVF_vect){
       }
     }
 
-    //check if this fading transition has finished finished
+    //check if, with this fading transition, 'currentColor' has reached RGB end stored in matrix
     for(k=0, flag = 0; k<RGB; k++){
       dif = abs(currentColor[k] - colors[endTransitionIdx][k]);
-      if(dif>0 && dif<=THRESH)
+      if(dif>0 && dif<=difference[strtTransitionIdx][k])
         flag=1;
     }
+
+    //if transition complete Transition indexes are incremented by 1, in order to load the new transition.
     if(flag){
       strtTransitionIdx++;
-      if(strtTransitionIdx > exprIdxEnd[crntExprIdx])
-        strtTransitionIdx = exprIdxStart[crntExprIdx];
+      //if one of the indexes has reached the end for the emotion, the first emotion index is loaded (fading loop)
+      if(strtTransitionIdx > exprIdxEnd[exprIdx])
+        strtTransitionIdx = exprIdxStart[exprIdx];
       
       endTransitionIdx++;
-      if(endTransitionIdx > exprIdxEnd[crntExprIdx])
-        endTransitionIdx = exprIdxStart[crntExprIdx];
+      if(endTransitionIdx > exprIdxEnd[exprIdx])
+        endTransitionIdx = exprIdxStart[exprIdx];
       
       for(k=0; k<RGB; k++){
         currentColor[k] = colors[strtTransitionIdx][k];
-      }
-      
-      Serial.print("change ");
-      Serial.print(strtTransitionIdx);
-      Serial.println(endTransitionIdx);
-      Serial.flush();
+      }      
+//      Serial.print("\n change ");
+//      Serial.print(strtTransitionIdx);
+//      Serial.println(endTransitionIdx);
+//      Serial.flush();
     } 
     nexttime = millis() + TIMESTEP;
     sei();
@@ -150,22 +184,21 @@ void calcDifference(){
     for(j=exprIdxStart[i]; j<exprIdxEnd[i]; j++){
       for(k=0; k<RGB; k++){
         difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[j+1][k]) * (int)TIMESTEP) / fadeTime[j]);
-        Serial.print(difference[j][k]);
-        Serial.print(',');
+//        Serial.print(difference[j][k]);
+//        Serial.print(',');
       }
-      Serial.println(' ');
-      Serial.flush();
+//      Serial.println(' ');
+//      Serial.flush();
     }
     for(k=0; k<RGB; k++){
       difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[exprIdxStart[i]][k]) * TIMESTEP) / fadeTime[j]);
-      Serial.print(difference[j][k]);
-      Serial.print(',');
+//      Serial.print(difference[j][k]);
+//      Serial.print(',');
     }
-    Serial.println(' ');
-    Serial.flush();
+//    Serial.println(' ');
+//    Serial.flush();
   }
-  
-  Serial.println("---\n");
+//  Serial.println("---\n");
 }
 
 void setup(){
@@ -177,18 +210,23 @@ void setup(){
   TIMSK2 = (1 << TOIE2);
 }
 
+void setEmotion(){
+  
+}
+
 void loop() {
-  for(crntExprIdx = 0; crntExprIdx < EXPRESSIONS; crntExprIdx++){
+  
+  for(exprIdx = 0; exprIdx < EXPRESSIONS; exprIdx++){
     cli();
-    strtTransitionIdx = exprIdxStart[crntExprIdx];
-    endTransitionIdx = exprIdxStart[crntExprIdx]+1;
-    Serial.println("----change----\n");
-    Serial.print("strtTransitionIdx: ");
-    Serial.println(strtTransitionIdx);
-    Serial.print("endTransitionIdx: ");
-    Serial.println(endTransitionIdx);
-    Serial.println("--------\n");
-    Serial.flush();
+    strtTransitionIdx = exprIdxStart[exprIdx];
+    endTransitionIdx = exprIdxStart[exprIdx]+1;
+//    Serial.println("\n---- CHANGE EMOTION ----\n");
+//    Serial.print("strtTransitionIdx: ");
+//    Serial.println(strtTransitionIdx);
+//    Serial.print("endTransitionIdx: ");
+//    Serial.println(endTransitionIdx);
+//    Serial.println("--------\n");
+//    Serial.flush();
     for(k=0; k<RGB; k++){
       currentColor[k] = colors[strtTransitionIdx][k];
     }
