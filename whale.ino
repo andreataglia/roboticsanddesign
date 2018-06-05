@@ -26,13 +26,14 @@
 #include <Adafruit_GFX.h>
 #include "Adafruit_LEDBackpack.h"
 #include "RTClib.h"
+#include "WhaleRGB.h"
 
 Adafruit_8x8matrix leftEye = Adafruit_8x8matrix();
 Adafruit_8x8matrix rightEye = Adafruit_8x8matrix();
 
 TMRpcm audioPlayer;
-
 RTC_PCF8523 rtc;
+WhaleRGB whaleRGB(LED1_R, LED1_G, LED1_B);
 
 bool presenceDetected = false;
 
@@ -40,16 +41,6 @@ void hardwareSetup()
 {  
   pinMode(SERVO_PIN, OUTPUT);
   pinMode(PIR_PIN, INPUT);
-  
-  pinMode(LED1_R, OUTPUT);
-  pinMode(LED1_G, OUTPUT);
-  pinMode(LED1_B, OUTPUT);
-  pinMode(LED2_R, OUTPUT);
-  pinMode(LED2_G, OUTPUT);
-  pinMode(LED2_B, OUTPUT);
-  pinMode(LED3_R, OUTPUT);
-  pinMode(LED3_G, OUTPUT);
-  pinMode(LED3_B, OUTPUT);
 
   //AUDIO
   audioPlayer.speakerPin = SPEAKER_PIN; 
@@ -84,7 +75,7 @@ void hardwareSetup()
   }
   Serial.println("Started"); 
 
-  attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
+  //attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
   
 }
 
@@ -102,11 +93,11 @@ bool getState()
   else return false;
 }
 
-void pir_handler()
-{
-  if(digitalRead(PIR_PIN)) presenceDetected = true;
-  else presenceDetected = false;
-}
+//void pir_handler()
+//{
+//  if(digitalRead(PIR_PIN)) presenceDetected = true;
+//  else presenceDetected = false;
+//}
 
 void makeBitmap(uint8_t rightEyeBMP[], uint8_t leftEyeBMP[])
 {
@@ -124,7 +115,9 @@ void makeBitmap(uint8_t rightEyeBMP[], uint8_t leftEyeBMP[])
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
+  whaleRGB.setEmotion('a');
 }
 
 void loop() {
+  
 }
