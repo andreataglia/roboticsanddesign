@@ -32,13 +32,13 @@ WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
 
 
-#define ACTIVATION 0
-#define JOY 1
-#define FEAR 2
-#define ANGER 3
-#define SAD 4
-#define DISGUST 5
-#define NEUTRAL 6
+#define ACTIVATION  0
+#define JOY         1
+#define FEAR        2
+#define ANGER       3
+#define SAD         4
+#define DISGUST     5
+#define NEUTRAL     6
 
 bool presenceDetected = false;
 
@@ -73,7 +73,7 @@ void hardwareSetup()
     Serial.flush();
   }
   whaleEyes.init();
-  whaleRGB.init(LED1_R, LED1_G, LED1_B);
+  whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
   Serial.println("Started"); 
   Serial.flush();
 

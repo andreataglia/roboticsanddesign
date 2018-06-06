@@ -100,22 +100,34 @@ unsigned long int nexttime = 50;
 int REDPIN1;
 int GREENPIN1;
 int BLUEPIN1;
+int REDPIN2;
+int GREENPIN2;
+int BLUEPIN2;
+int REDPIN3;
+int GREENPIN3;
+int BLUEPIN3;
 
 WhaleRGB::WhaleRGB(){}
 
-void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B){
+void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B,int LED2_R,int LED2_G,int LED2_B,int LED3_R,int LED3_G,int LED3_B){
   pinMode(LED1_R, OUTPUT);
   pinMode(LED1_G, OUTPUT);
   pinMode(LED1_B, OUTPUT);
-//  pinMode(LED2_R, OUTPUT);
-//  pinMode(LED2_G, OUTPUT);
-//  pinMode(LED2_B, OUTPUT);
-//  pinMode(LED3_R, OUTPUT);
-//  pinMode(LED3_G, OUTPUT);
-//  pinMode(LED3_B, OUTPUT);
+  pinMode(LED2_R, OUTPUT);
+  pinMode(LED2_G, OUTPUT);
+  pinMode(LED2_B, OUTPUT);
+  pinMode(LED3_R, OUTPUT);
+  pinMode(LED3_G, OUTPUT);
+  pinMode(LED3_B, OUTPUT);
   REDPIN1 = LED1_R;
   GREENPIN1 = LED1_G;
   BLUEPIN1 = LED1_B;
+  REDPIN2 = LED2_R;
+  GREENPIN2 = LED2_G;
+  BLUEPIN2 = LED2_B;
+  REDPIN3 = LED3_R;
+  GREENPIN3 = LED3_G;
+  BLUEPIN3 = LED3_B;
 
   calcDifference();
   TIMSK2 = (1 << TOIE2);
@@ -163,8 +175,14 @@ ISR(TIMER2_OVF_vect){
     
     //RGB write from the previous color
     analogWrite(REDPIN1, currentColor[0]);
+    analogWrite(REDPIN2, currentColor[0]);
+    analogWrite(REDPIN3, currentColor[0]);
     analogWrite(GREENPIN1, currentColor[1]);
+    analogWrite(GREENPIN1, currentColor[1]);
+    analogWrite(GREENPIN3, currentColor[1]);
     analogWrite(BLUEPIN1, currentColor[2]);
+    analogWrite(BLUEPIN2, currentColor[2]);
+    analogWrite(BLUEPIN3, currentColor[2]);
     
     // Calculate new color for next ISR
     for(k = 0; k < RGB; k++){
