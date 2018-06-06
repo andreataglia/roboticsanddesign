@@ -22,18 +22,13 @@
 #include <SD.h>
 #include <TMRpcm.h>
 #include <SPI.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include "Adafruit_LEDBackpack.h"
 #include "RTClib.h"
 #include "WhaleRGB.h"
-
-Adafruit_8x8matrix leftEye = Adafruit_8x8matrix();
-Adafruit_8x8matrix rightEye = Adafruit_8x8matrix();
+#include "WhaleEyes.h"
 
 TMRpcm audioPlayer;
 RTC_PCF8523 rtc;
-WhaleRGB whaleRGB(LED1_R, LED1_G, LED1_B);
+
 
 bool presenceDetected = false;
 
@@ -47,21 +42,13 @@ void hardwareSetup()
   audioPlayer.setVolume(7);
   audioPlayer.quality(0);
 
-  //LED MATRIX
-  leftEye.begin(0x71);  // pass in the address
-  rightEye.begin(0x70);  // pass in the address
-
-  leftEye.setBrightness(15);
-  leftEye.setRotation(1);
-  rightEye.setBrightness(15);
-  rightEye.setRotation(1);
-
   //BLUETOOTH
   Serial3.begin(9600);
 
   //SD
   if (!SD.begin(SD_CS_PIN)) { 
     Serial.println("SD fail. I keep going anyway...");  
+    Serial.flush();
     //return;
   }
 
@@ -69,14 +56,16 @@ void hardwareSetup()
   
   if (! rtc.begin()) {
     Serial.println("RTC Fail. I keep going anyway...");
+    Serial.flush();
   }  
   if (! rtc.initialized()) {
     Serial.println("RTC is NOT running!");
+    Serial.flush();
   }
   Serial.println("Started"); 
+  Serial.flush();
 
   //attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
-  
 }
 
 void getTime(byte* h, byte* m)
@@ -99,23 +88,14 @@ bool getState()
 //  else presenceDetected = false;
 //}
 
-void makeBitmap(uint8_t rightEyeBMP[], uint8_t leftEyeBMP[])
-{
-  leftEye.clear();
-  //(x, y, bitmap, width, height, color)
-  leftEye.drawBitmap(0, 0, leftEyeBMP, 8, 8, LED_ON);
-  leftEye.writeDisplay();
-  
-  rightEye.clear();
-  //(x, y, bitmap, width, height, color)
-  rightEye.drawBitmap(0, 0, rightEyeBMP, 8, 8, LED_ON);
-  rightEye.writeDisplay();  
-}
 
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
+  WhaleRGB whaleRGB(LED1_R, LED1_G, LED1_B);
   whaleRGB.setEmotion('a');
+  WhaleEyes whaleEyes;
+  whaleEyes.setEmotion('a');
 }
 
 void loop() {

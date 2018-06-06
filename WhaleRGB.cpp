@@ -122,23 +122,31 @@ WhaleRGB::WhaleRGB(int LED1_R,int LED1_G,int LED1_B)
 
 void WhaleRGB::setEmotion(char e)
 {
-  for(exprIdx = 0; exprIdx < EXPRESSIONS; exprIdx++){
-    cli();
-    strtTransitionIdx = exprIdxStart[exprIdx];
-    endTransitionIdx = exprIdxStart[exprIdx]+1;
-//    Serial.println("\n---- CHANGE EMOTION ----\n");
-//    Serial.print("strtTransitionIdx: ");
-//    Serial.println(strtTransitionIdx);
-//    Serial.print("endTransitionIdx: ");
-//    Serial.println(endTransitionIdx);
-//    Serial.println("--------\n");
-//    Serial.flush();
-    for(k=0; k<RGB; k++){
-      currentColor[k] = colors[strtTransitionIdx][k];
-    }
-    sei();
-    delay(16000);
+  cli();
+  exprIdx=1;
+  strtTransitionIdx = exprIdxStart[exprIdx];
+  endTransitionIdx = exprIdxStart[exprIdx]+1;
+  for(k=0; k<RGB; k++){
+    currentColor[k] = colors[strtTransitionIdx][k];
   }
+  sei();
+//  for(exprIdx = 0; exprIdx < EXPRESSIONS; exprIdx++){
+//    cli();
+//    strtTransitionIdx = exprIdxStart[exprIdx];
+//    endTransitionIdx = exprIdxStart[exprIdx]+1;
+////    Serial.println("\n---- CHANGE EMOTION ----\n");
+////    Serial.print("strtTransitionIdx: ");
+////    Serial.println(strtTransitionIdx);
+////    Serial.print("endTransitionIdx: ");
+////    Serial.println(endTransitionIdx);
+////    Serial.println("--------\n");
+////    Serial.flush();
+//    for(k=0; k<RGB; k++){
+//      currentColor[k] = colors[strtTransitionIdx][k];
+//    }
+//    sei();
+//    delay(16000);
+//  }
 }
 
 void WhaleRGB::dash()
