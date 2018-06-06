@@ -101,8 +101,9 @@ int REDPIN1;
 int GREENPIN1;
 int BLUEPIN1;
 
-WhaleRGB::WhaleRGB(int LED1_R,int LED1_G,int LED1_B)
-{
+WhaleRGB::WhaleRGB(){}
+
+void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B){
   pinMode(LED1_R, OUTPUT);
   pinMode(LED1_G, OUTPUT);
   pinMode(LED1_B, OUTPUT);
@@ -112,10 +113,10 @@ WhaleRGB::WhaleRGB(int LED1_R,int LED1_G,int LED1_B)
 //  pinMode(LED3_R, OUTPUT);
 //  pinMode(LED3_G, OUTPUT);
 //  pinMode(LED3_B, OUTPUT);
-  _pin = LED1_R;
   REDPIN1 = LED1_R;
   GREENPIN1 = LED1_G;
   BLUEPIN1 = LED1_B;
+
   calcDifference();
   TIMSK2 = (1 << TOIE2);
 }
@@ -147,14 +148,6 @@ void WhaleRGB::setEmotion(byte idx)
 //    sei();
 //    delay(16000);
 //  }
-}
-
-void WhaleRGB::dash()
-{
-  digitalWrite(_pin, HIGH);
-  delay(1000);
-  digitalWrite(_pin, LOW);
-  delay(250);
 }
 
 ISR(TIMER2_OVF_vect){

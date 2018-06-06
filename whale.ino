@@ -29,6 +29,8 @@
 TMRpcm audioPlayer;
 RTC_PCF8523 rtc;
 WhaleEyes whaleEyes;
+WhaleRGB whaleRGB;
+
 
 #define ACTIVATION 0
 #define JOY 1
@@ -71,6 +73,7 @@ void hardwareSetup()
     Serial.flush();
   }
   whaleEyes.init();
+  whaleRGB.init(LED1_R, LED1_G, LED1_B);
   Serial.println("Started"); 
   Serial.flush();
 
@@ -101,9 +104,8 @@ bool getState()
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
-  WhaleRGB whaleRGB(LED1_R, LED1_G, LED1_B);
-  whaleRGB.setEmotion(ANGER);
-  whaleEyes.setEmotion(ANGER);
+  whaleRGB.setEmotion(JOY);
+  whaleEyes.setEmotion(JOY);
 }
 
 void loop() {

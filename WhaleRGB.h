@@ -6,12 +6,11 @@
 class WhaleRGB
 {
   public:
-    WhaleRGB(int, int, int);
+    WhaleRGB();
+    void init(int, int, int);
     void setEmotion(byte);
-    void dash();
   private:
     void calcDifference();
-    int _pin;
     
 };
 
