@@ -135,8 +135,9 @@ uint8_t* bpmIdx[EXPRESSIONS*2] = {
   &neutralLeft_bpm[0], &neutralRight_bpm[0]
 };
 
-WhaleEyes::WhaleEyes()
-{
+WhaleEyes::WhaleEyes(){}
+
+void WhaleEyes::init(){
   leftEye.begin(0x71);  // pass in the address
   rightEye.begin(0x70);  // pass in the address
 
