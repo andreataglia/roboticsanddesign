@@ -29,6 +29,13 @@
 TMRpcm audioPlayer;
 RTC_PCF8523 rtc;
 
+#define ACTIVATION 0
+#define JOY 1
+#define FEAR 2
+#define ANGER 3
+#define SAD 4
+#define DISGUST 5
+#define NEUTRAL 6
 
 bool presenceDetected = false;
 
@@ -93,9 +100,9 @@ void setup() {
   Serial.begin(9600);
   hardwareSetup();
   WhaleRGB whaleRGB(LED1_R, LED1_G, LED1_B);
-  whaleRGB.setEmotion('a');
+  whaleRGB.setEmotion(JOY);
   WhaleEyes whaleEyes;
-  whaleEyes.setEmotion('a');
+  whaleEyes.setEmotion(JOY);
 }
 
 void loop() {

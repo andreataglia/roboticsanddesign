@@ -146,13 +146,9 @@ WhaleEyes::WhaleEyes()
   rightEye.setRotation(1);
 }
 
-void WhaleEyes::setEmotion(char e){
-  while(1){
-  for(int s=0; s<EXPRESSIONS*2; s+=2){
+void WhaleEyes::setEmotion(byte idx){
+    byte s=idx*2;
     writeMatrix(bpmIdx[s], bpmIdx[s+1]);
-    delay(1000);
-  }
-  }
 }
 
 void WhaleEyes::writeMatrix(uint8_t left_bmp[], uint8_t right_bmp[]){

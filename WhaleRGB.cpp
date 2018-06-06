@@ -120,10 +120,10 @@ WhaleRGB::WhaleRGB(int LED1_R,int LED1_G,int LED1_B)
   TIMSK2 = (1 << TOIE2);
 }
 
-void WhaleRGB::setEmotion(char e)
+void WhaleRGB::setEmotion(byte idx)
 {
   cli();
-  exprIdx=1;
+  exprIdx=idx;
   strtTransitionIdx = exprIdxStart[exprIdx];
   endTransitionIdx = exprIdxStart[exprIdx]+1;
   for(k=0; k<RGB; k++){
