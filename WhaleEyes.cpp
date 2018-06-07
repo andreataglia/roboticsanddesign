@@ -147,7 +147,7 @@ void WhaleEyes::init(){
   rightEye.setRotation(1);
 }
 
-void WhaleEyes::setEmotion(byte idx){
+void WhaleEyes::setEmotion(short idx){
     byte s=idx*2;
     writeMatrix(bpmIdx[s], bpmIdx[s+1]);
 }

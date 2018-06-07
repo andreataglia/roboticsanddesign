@@ -107,16 +107,14 @@ bool getState()
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
-  whaleRGB.setEmotion(JOY);
-  whaleEyes.setEmotion(JOY);
   whaleFins.setEmotion(JOY);
 }
 
 void loop() {
-//  whaleRGB.setEmotion(JOY,10000);
-//  whaleEyes.setEmotion(JOY);
-//  delay(8000);
-//  whaleRGB.setEmotion(SAD,7000);
-//  whaleEyes.setEmotion(SAD);
-//  delay(7000);
+  whaleRGB.setEmotion(JOY,10000);
+  whaleEyes.setEmotion(JOY);
+  delay(8000);
+  whaleRGB.setEmotion(SAD,7000);
+  whaleEyes.setEmotion(SAD);
+  delay(7000);
 }

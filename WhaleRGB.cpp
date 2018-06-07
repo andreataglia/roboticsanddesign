@@ -14,7 +14,6 @@
 #define RGB 3
 
 byte currentColor[RGB] = {0,0,0};
-byte exprIdx;
 
 /**
  * All the colors for all the emotion transitions are hardcoded in matrix
@@ -91,7 +90,8 @@ byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25,32};
  * The RGB-step depends on RGB Source and Destination, individual transition time-to-fade, constant TimeStep.
  */
 byte difference[NUMCOLOR][RGB];
-byte strtTransitionIdx, endTransitionIdx;
+short strtTransitionIdx, endTransitionIdx;
+short exprIdx;
 
           ///////////////////////////
           //---Control Variables---//
@@ -138,7 +138,7 @@ void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B,int LED2_R,int LED2_G,int L
   TIMSK2 = (1 << TOIE2);
 }
 
-void WhaleRGB::setEmotion(byte idx, unsigned long int dur){
+void WhaleRGB::setEmotion(short idx, unsigned long int dur){
   cli();
   exprIdx=idx;
   strtTransitionIdx = exprIdxStart[exprIdx];

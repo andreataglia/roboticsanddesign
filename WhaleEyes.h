@@ -8,7 +8,7 @@ class WhaleEyes
   public:
     WhaleEyes();
     void init();
-    void setEmotion(byte);
+    void setEmotion(short);
     void writeMatrix(uint8_t[], uint8_t[]);
 };
 
