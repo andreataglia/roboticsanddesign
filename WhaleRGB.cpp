@@ -7,6 +7,7 @@
 
 //Time in milliseconds LED stays fixed on a RGB value during "Color fading"
 #define TIMESTEP 50
+#define TIME_THRESH 100
 #define EXPRESSIONS 7
 //Hardcoded emotion color matrix row dimension
 #define NUMCOLOR 33
@@ -84,6 +85,7 @@ int fadeTime[NUMCOLOR] = {
  */
 byte exprIdxStart[EXPRESSIONS]={0,2,11,15,19,24,26};
 byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25,32};
+
 /**
  * In order to easilly change the colors of the individual transitions, this matrix stores all the RGB-step from a color to the next.
  * The RGB-step depends on RGB Source and Destination, individual transition time-to-fade, constant TimeStep.
@@ -94,8 +96,11 @@ byte strtTransitionIdx, endTransitionIdx;
           ///////////////////////////
           //---Control Variables---//
           ///////////////////////////
-byte i, j, k, dif, flag;
+byte i, j, k, dif;
 unsigned long int nexttime = 50;
+unsigned long int duration;
+bool colorReached, activeEmotion=false;
+
 
 int REDPIN1;
 int GREENPIN1;
@@ -133,8 +138,7 @@ void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B,int LED2_R,int LED2_G,int L
   TIMSK2 = (1 << TOIE2);
 }
 
-void WhaleRGB::setEmotion(byte idx)
-{
+void WhaleRGB::setEmotion(byte idx, unsigned long int dur){
   cli();
   exprIdx=idx;
   strtTransitionIdx = exprIdxStart[exprIdx];
@@ -142,36 +146,21 @@ void WhaleRGB::setEmotion(byte idx)
   for(k=0; k<RGB; k++){
     currentColor[k] = colors[strtTransitionIdx][k];
   }
+  duration = dur;
+  activeEmotion = true;
   sei();
-//  for(exprIdx = 0; exprIdx < EXPRESSIONS; exprIdx++){
-//    cli();
-//    strtTransitionIdx = exprIdxStart[exprIdx];
-//    endTransitionIdx = exprIdxStart[exprIdx]+1;
-////    Serial.println("\n---- CHANGE EMOTION ----\n");
-////    Serial.print("strtTransitionIdx: ");
-////    Serial.println(strtTransitionIdx);
-////    Serial.print("endTransitionIdx: ");
-////    Serial.println(endTransitionIdx);
-////    Serial.println("--------\n");
-////    Serial.flush();
-//    for(k=0; k<RGB; k++){
-//      currentColor[k] = colors[strtTransitionIdx][k];
-//    }
-//    sei();
-//    delay(16000);
-//  }
 }
 
 ISR(TIMER2_OVF_vect){
-  if (millis() > nexttime) {
+  if (millis() > nexttime && activeEmotion){
     //disable Global interrupt in order to prevent other ISR
     cli();
-//    Serial.print(currentColor[0]);
-//    Serial.print(", ");
-//    Serial.print(currentColor[1]);
-//    Serial.print(", ");
-//    Serial.println(currentColor[2]);
-//    Serial.flush();
+   // Serial.print(currentColor[0]);
+   // Serial.print(", ");
+   // Serial.print(currentColor[1]);
+   // Serial.print(", ");
+   // Serial.println(currentColor[2]);
+   // Serial.flush();
     
     //RGB write from the previous color
     analogWrite(REDPIN1, currentColor[0]);
@@ -195,14 +184,14 @@ ISR(TIMER2_OVF_vect){
     }
 
     //check if, with this fading transition, 'currentColor' has reached RGB end stored in matrix
-    for(k=0, flag = 0; k<RGB; k++){
+    for(k=0, colorReached = false; k<RGB; k++){
       dif = abs(currentColor[k] - colors[endTransitionIdx][k]);
       if(dif>0 && dif<=difference[strtTransitionIdx][k])
-        flag=1;
+        colorReached = true;
     }
 
     //if transition complete Transition indexes are incremented by 1, in order to load the new transition.
-    if(flag){
+    if(colorReached){
       strtTransitionIdx++;
       //if one of the indexes has reached the end for the emotion, the first emotion index is loaded (fading loop)
       if(strtTransitionIdx > exprIdxEnd[exprIdx])
@@ -215,12 +204,15 @@ ISR(TIMER2_OVF_vect){
       for(k=0; k<RGB; k++){
         currentColor[k] = colors[strtTransitionIdx][k];
       }      
-//      Serial.print("\n change ");
-//      Serial.print(strtTransitionIdx);
-//      Serial.println(endTransitionIdx);
-//      Serial.flush();
+     // Serial.print("\n change ");
+     // Serial.print(strtTransitionIdx);
+     // Serial.println(endTransitionIdx);
+     // Serial.flush();
     } 
     nexttime = millis() + TIMESTEP;
+    duration -= millis();
+    if(duration <= TIME_THRESH)
+      activeEmotion = false;
     sei();
   }
 }
@@ -230,19 +222,19 @@ void WhaleRGB::calcDifference(){
     for(j=exprIdxStart[i]; j<exprIdxEnd[i]; j++){
       for(k=0; k<RGB; k++){
         difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[j+1][k]) * (int)TIMESTEP) / fadeTime[j]);
-//        Serial.print(difference[j][k]);
-//        Serial.print(',');
+       // Serial.print(difference[j][k]);
+       // Serial.print(',');
       }
-//      Serial.println(' ');
-//      Serial.flush();
+     // Serial.println(' ');
+     // Serial.flush();
     }
     for(k=0; k<RGB; k++){
       difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[exprIdxStart[i]][k]) * TIMESTEP) / fadeTime[j]);
-//      Serial.print(difference[j][k]);
-//      Serial.print(',');
+     // Serial.print(difference[j][k]);
+     // Serial.print(',');
     }
-//    Serial.println(' ');
-//    Serial.flush();
+   // Serial.println(' ');
+   // Serial.flush();
   }
-//  Serial.println("---\n");
+ // Serial.println("---\n");
 }

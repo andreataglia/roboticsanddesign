@@ -8,7 +8,7 @@ class WhaleRGB
   public:
     WhaleRGB();
     void init(int, int, int, int, int, int, int, int, int);
-    void setEmotion(byte);
+    void setEmotion(byte, unsigned long int);
   private:
     void calcDifference();
     

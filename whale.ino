@@ -113,5 +113,10 @@ void setup() {
 }
 
 void loop() {
-  
+//  whaleRGB.setEmotion(JOY,10000);
+//  whaleEyes.setEmotion(JOY);
+//  delay(8000);
+//  whaleRGB.setEmotion(SAD,7000);
+//  whaleEyes.setEmotion(SAD);
+//  delay(7000);
 }
