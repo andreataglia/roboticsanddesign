@@ -19,20 +19,18 @@
 
 #define LDR_TRIGGERVALUE 400
 
-#include <SD.h>
-#include <TMRpcm.h>
 #include <SPI.h>
 #include "RTClib.h"
 #include "WhaleRGB.h"
 #include "WhaleEyes.h"
 #include "WhaleFins.h"
+#include "WhaleSound.h"
 
-TMRpcm audioPlayer;
 RTC_PCF8523 rtc;
 WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
 WhaleFins whaleFins;
-
+WhaleSound whaleSound;
 
 #define ACTIVATION  0
 #define JOY         1
@@ -48,20 +46,8 @@ void hardwareSetup()
 {  
   pinMode(PIR_PIN, INPUT);
 
-  //AUDIO
-  audioPlayer.speakerPin = SPEAKER_PIN; 
-  audioPlayer.setVolume(7);
-  audioPlayer.quality(0);
-
   //BLUETOOTH
   Serial3.begin(9600);
-
-  //SD
-  if (!SD.begin(SD_CS_PIN)) { 
-    Serial.println("SD fail. I keep going anyway...");  
-    Serial.flush();
-    //return;
-  }
 
   //RTC
   
@@ -76,6 +62,7 @@ void hardwareSetup()
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
   whaleFins.init(SERVO_PIN);
+  whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
 
   Serial.println("Started"); 
   Serial.flush();
@@ -107,7 +94,8 @@ bool getState()
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
-  whaleFins.setEmotion(JOY);
+  //whaleFins.setEmotion(JOY);
+  //whaleSound.setEmotion(JOY);
 }
 
 void loop() {
