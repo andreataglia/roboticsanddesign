@@ -25,11 +25,13 @@
 #include "RTClib.h"
 #include "WhaleRGB.h"
 #include "WhaleEyes.h"
+#include "WhaleFins.h"
 
 TMRpcm audioPlayer;
 RTC_PCF8523 rtc;
 WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
+WhaleFins whaleFins;
 
 
 #define ACTIVATION  0
@@ -44,7 +46,6 @@ bool presenceDetected = false;
 
 void hardwareSetup()
 {  
-  pinMode(SERVO_PIN, OUTPUT);
   pinMode(PIR_PIN, INPUT);
 
   //AUDIO
@@ -74,6 +75,8 @@ void hardwareSetup()
   }
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
+  whaleFins.init(SERVO_PIN);
+
   Serial.println("Started"); 
   Serial.flush();
 
@@ -106,6 +109,7 @@ void setup() {
   hardwareSetup();
   whaleRGB.setEmotion(JOY);
   whaleEyes.setEmotion(JOY);
+  whaleFins.setEmotion(JOY);
 }
 
 void loop() {
