@@ -3,15 +3,13 @@
 
 #include "Arduino.h"
 
-class WhaleRGB
-{
+class WhaleRGB{
   public:
     WhaleRGB();
     void init(int, int, int, int, int, int, int, int, int);
     void setEmotion(short, unsigned long int);
   private:
     void calcDifference();
-    
 };
 
 #endif

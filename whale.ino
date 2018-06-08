@@ -19,7 +19,6 @@
 
 #define LDR_TRIGGERVALUE 400
 
-#include <SPI.h>
 #include "RTClib.h"
 #include "WhaleRGB.h"
 #include "WhaleEyes.h"
@@ -66,43 +65,45 @@ void hardwareSetup()
 
   Serial.println("Started"); 
   Serial.flush();
-
+  attachInterrupt(digitalPinToInterrupt(PUSHBUTTON_PIN), button_handler, CHANGE);
   //attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
 }
 
-void getTime(byte* h, byte* m)
-{
-    DateTime now = rtc.now();
+void button_handler(){
+  setEmotion(SAD,7000);
+  return;
+}
 
+void getTime(byte* h, byte* m){
+    DateTime now = rtc.now();
     *h = now.hour();
     *m = now.minute();
 }
 
-bool getState()
-{
+bool getState(){
   if(analogRead(LDR_PIN) > LDR_TRIGGERVALUE) return true;
   else return false;
 }
 
-//void pir_handler()
-//{
+//void pir_handler(){
 //  if(digitalRead(PIR_PIN)) presenceDetected = true;
 //  else presenceDetected = false;
 //}
 
-
+void setEmotion(short emotionIndex, unsigned long int duration){
+  whaleRGB.setEmotion(emotionIndex, duration);
+  whaleEyes.setEmotion(emotionIndex, duration);
+  //whaleFins.setEmotion(emotionIndex);
+  //whaleSound.setEmotion(emotionIndex);
+}
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
-  //whaleFins.setEmotion(JOY);
-  //whaleSound.setEmotion(JOY);
 }
 
 void loop() {
-  whaleRGB.setEmotion(JOY,10000);
-  whaleEyes.setEmotion(JOY);
-  delay(8000);
-  whaleRGB.setEmotion(SAD,7000);
-  whaleEyes.setEmotion(SAD);
-  delay(7000);
+  for(short i=0; i<7; i++){
+    setEmotion(i, 9000);
+    delay(9000);
+  }
 }

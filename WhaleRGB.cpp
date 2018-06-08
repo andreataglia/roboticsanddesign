@@ -7,7 +7,7 @@
 
 //Time in milliseconds LED stays fixed on a RGB value during "Color fading"
 #define TIMESTEP 50
-#define TIME_THRESH 100
+#define TIME_THRESH 50
 #define EXPRESSIONS 7
 //Hardcoded emotion color matrix row dimension
 #define NUMCOLOR 33
@@ -97,9 +97,9 @@ short exprIdx;
           //---Control Variables---//
           ///////////////////////////
 byte i, j, k, dif;
-unsigned long int nexttime = 50;
+unsigned long int nexttime;
 unsigned long int duration;
-bool colorReached, activeEmotion=false;
+bool colorReached, activeEmotion;
 
 
 int REDPIN1;
@@ -135,6 +135,8 @@ void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B,int LED2_R,int LED2_G,int L
   BLUEPIN3 = LED3_B;
 
   calcDifference();
+  activeEmotion=false;
+  nexttime = 50;
   TIMSK2 = (1 << TOIE2);
 }
 
@@ -155,13 +157,13 @@ ISR(TIMER2_OVF_vect){
   if (millis() > nexttime && activeEmotion){
     //disable Global interrupt in order to prevent other ISR
     cli();
-   // Serial.print(currentColor[0]);
-   // Serial.print(", ");
-   // Serial.print(currentColor[1]);
-   // Serial.print(", ");
-   // Serial.println(currentColor[2]);
-   // Serial.flush();
-    
+    // Serial.print(currentColor[0]);
+    // Serial.print(", ");
+    // Serial.print(currentColor[1]);
+    // Serial.print(", ");
+    // Serial.println(currentColor[2]);
+    // Serial.flush();
+      
     //RGB write from the previous color
     analogWrite(REDPIN1, currentColor[0]);
     analogWrite(REDPIN2, currentColor[0]);
@@ -172,7 +174,7 @@ ISR(TIMER2_OVF_vect){
     analogWrite(BLUEPIN1, currentColor[2]);
     analogWrite(BLUEPIN2, currentColor[2]);
     analogWrite(BLUEPIN3, currentColor[2]);
-    
+      
     // Calculate new color for next ISR
     for(k = 0; k < RGB; k++){
       if(currentColor[k] != colors[endTransitionIdx][k]){
@@ -182,14 +184,14 @@ ISR(TIMER2_OVF_vect){
           currentColor[k] -= difference[strtTransitionIdx][k];
       }
     }
-
+  
     //check if, with this fading transition, 'currentColor' has reached RGB end stored in matrix
     for(k=0, colorReached = false; k<RGB; k++){
       dif = abs(currentColor[k] - colors[endTransitionIdx][k]);
       if(dif>0 && dif<=difference[strtTransitionIdx][k])
         colorReached = true;
     }
-
+  
     //if transition complete Transition indexes are incremented by 1, in order to load the new transition.
     if(colorReached){
       strtTransitionIdx++;
@@ -210,12 +212,25 @@ ISR(TIMER2_OVF_vect){
      // Serial.flush();
     } 
     nexttime = millis() + TIMESTEP;
-    duration -= millis();
-    if(duration <= TIME_THRESH)
+    duration -= TIMESTEP;
+    if(duration < TIME_THRESH){
+     Serial.println("RGB stopEmotion");
+     Serial.flush();
       activeEmotion = false;
+      analogWrite(REDPIN1, 0);
+      analogWrite(REDPIN2, 0);
+      analogWrite(REDPIN3, 0);
+      analogWrite(GREENPIN1, 0);
+      analogWrite(GREENPIN1, 0);
+      analogWrite(GREENPIN3, 0);
+      analogWrite(BLUEPIN1, 0);
+      analogWrite(BLUEPIN2, 0);
+      analogWrite(BLUEPIN3, 0);
+    }
     sei();
   }
 }
+
 
 void WhaleRGB::calcDifference(){
   for(i=0; i<EXPRESSIONS; i++){
