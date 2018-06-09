@@ -92,7 +92,7 @@ bool getState(){
 
 void setEmotion(short emotionIndex, unsigned long int duration){
   whaleRGB.setEmotion(emotionIndex, duration);
-  whaleEyes.setEmotion(emotionIndex, duration);
+  whaleEyes.setEmotion(emotionIndex);
   //whaleFins.setEmotion(emotionIndex);
   //whaleSound.setEmotion(emotionIndex);
 }
