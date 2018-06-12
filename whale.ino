@@ -17,15 +17,15 @@
 #define LED3_G            6
 #define LED3_B            7
 
-#include "RTClib.h"
 #include "WhaleController.h"
 
-RTC_PCF8523 rtc;
+
 WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
 WhaleFins whaleFins;
 WhaleSound whaleSound;
 WhaleController whaleController;
+WhaleRTC whaleRTC;
 
 #define ACTIVATION  0
 #define JOY         1
@@ -41,30 +41,15 @@ void hardwareSetup()
   //BLUETOOTH
   Serial3.begin(9600);
 
-  //RTC
-  if (! rtc.begin()) {
-    Serial.println("RTC Fail. I keep going anyway...");
-    Serial.flush();
-  }  
-  if (! rtc.initialized()) {
-    Serial.println("RTC is NOT running!");
-    Serial.flush();
-  }
-
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
   whaleFins.init(SERVO_PIN);
   whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
   whaleController.init(whaleRGB, whaleSound, whaleFins, whaleEyes);
+  whaleRTC.init();
 
   Serial.println("Started"); 
   Serial.flush();
-}
-
-void getTime(byte* h, byte* m){
-    DateTime now = rtc.now();
-    *h = now.hour();
-    *m = now.minute();
 }
 
 void setup() {
