@@ -13,6 +13,7 @@ void WhaleController::init(WhaleRGB whaleRGB, WhaleSound whaleSound, WhaleFins w
   this->whaleSound = whaleSound;
   this->whaleFins = whaleFins;
   this->whaleEyes = whaleEyes;
+  state = IDLE;
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////

@@ -16,6 +16,7 @@ class WhaleController
     void buttonHandler();
     void pirHandler();
     void setEmotion(short, unsigned long int);
+    short state;
   private:
     
     void initButton(int);

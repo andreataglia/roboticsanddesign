@@ -34,6 +34,7 @@ WhaleRTC whaleRTC;
 #define SAD         4
 #define DISGUST     5
 #define NEUTRAL     6
+#define IDLE_STATE  7
 
 void hardwareSetup()
 {  
