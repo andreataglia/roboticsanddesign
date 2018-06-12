@@ -2,10 +2,10 @@
 #include "WhaleController.h"
 
 #define LDR_TRIGGERVALUE 400
-WhaleController whaleControllerInstance;
+WhaleController *whaleControllerInstance;
 
 WhaleController::WhaleController(){
-	whaleControllerInstance* this;
+	whaleControllerInstance = this;
 }
 
 void WhaleController::init(WhaleRGB whaleRGB, WhaleSound whaleSound, WhaleFins whaleFins, WhaleEyes whaleEyes){
@@ -14,6 +14,21 @@ void WhaleController::init(WhaleRGB whaleRGB, WhaleSound whaleSound, WhaleFins w
   this->whaleFins = whaleFins;
   this->whaleEyes = whaleEyes;
 }
+
+//////////////////////// ISR ////////////////////////////////////////////////////////
+
+void buttonChanged(){
+  if (whaleControllerInstance)
+      whaleControllerInstance->buttonHandler();
+}
+
+void pirChanged(){
+  if (whaleControllerInstance){
+      whaleControllerInstance->pirHandler();
+  }
+}
+
+//////////////////////// Methods ////////////////////////////////////////////////////////
 
 void WhaleController::setEmotion(short emotion, unsigned long int duration){
 	whaleRGB.setEmotion(emotion, duration);
@@ -42,25 +57,12 @@ void WhaleController::routine(){
 }
 
 void WhaleController::buttonHandler(){
-  this.setEmotion(3, 1000);
+  this->setEmotion(3, 1000);
 }
 
 void WhaleController::pirHandler(){
   	if(digitalRead(this->pir_pin)){
 		//TODO
- 	}
-}
-
-//////////////////////// ISR ////////////////////////////////////////////////////////
-
-void buttonChanged(){
-	if (whaleControllerInstance)
-     	whaleControllerInstance->buttonHandler();
-}
-
-void pirChanged(){
- 	if (whaleControllerInstance){
-     	whaleControllerInstance->pirHandler();
  	}
 }
 

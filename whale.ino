@@ -59,8 +59,6 @@ void hardwareSetup()
 
   Serial.println("Started"); 
   Serial.flush();
-  
-  //attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
 }
 
 void getTime(byte* h, byte* m){
@@ -76,7 +74,7 @@ void setup() {
 
 void loop() {
   for(short i=0; i<7; i++){
-    setEmotion(i, 9000);
+    whaleController.setEmotion(i, 9000);
     delay(9000);
   }
 }
