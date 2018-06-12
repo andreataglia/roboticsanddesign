@@ -19,13 +19,12 @@
 
 #include "WhaleController.h"
 
-
 WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
 WhaleFins whaleFins;
 WhaleSound whaleSound;
-WhaleController whaleController;
 WhaleRTC whaleRTC;
+WhaleController whaleController;
 
 #define ACTIVATION  0
 #define JOY         1
@@ -36,26 +35,21 @@ WhaleRTC whaleRTC;
 #define NEUTRAL     6
 #define IDLE_STATE  7
 
-void hardwareSetup()
-{  
-
-  //BLUETOOTH
+void setup() {
+  Serial.begin(9600);
+  
+   //BLUETOOTH
   Serial3.begin(9600);
 
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
   whaleFins.init(SERVO_PIN);
   whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
-  whaleController.init(whaleRGB, whaleSound, whaleFins, whaleEyes);
   whaleRTC.init();
+  whaleController.init(whaleRGB, whaleSound, whaleFins, whaleEyes);
 
   Serial.println("Started"); 
   Serial.flush();
-}
-
-void setup() {
-  Serial.begin(9600);
-  hardwareSetup();
 }
 
 void loop() {

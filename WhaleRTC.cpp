@@ -1,5 +1,5 @@
 #include "Arduino.h"
-#include "WhaleRTC"
+#include "WhaleRTC.h"
 
 #include "RTClib.h"
 
