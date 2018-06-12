@@ -17,19 +17,15 @@
 #define LED3_G            6
 #define LED3_B            7
 
-#define LDR_TRIGGERVALUE 400
-
 #include "RTClib.h"
-#include "WhaleRGB.h"
-#include "WhaleEyes.h"
-#include "WhaleFins.h"
-#include "WhaleSound.h"
+#include "WhaleController.h"
 
 RTC_PCF8523 rtc;
 WhaleEyes whaleEyes;
 WhaleRGB whaleRGB;
 WhaleFins whaleFins;
 WhaleSound whaleSound;
+WhaleController whaleController;
 
 #define ACTIVATION  0
 #define JOY         1
@@ -39,17 +35,13 @@ WhaleSound whaleSound;
 #define DISGUST     5
 #define NEUTRAL     6
 
-bool presenceDetected = false;
-
 void hardwareSetup()
 {  
-  pinMode(PIR_PIN, INPUT);
 
   //BLUETOOTH
   Serial3.begin(9600);
 
   //RTC
-  
   if (! rtc.begin()) {
     Serial.println("RTC Fail. I keep going anyway...");
     Serial.flush();
@@ -58,20 +50,17 @@ void hardwareSetup()
     Serial.println("RTC is NOT running!");
     Serial.flush();
   }
+
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED1_G, LED1_B, LED2_R, LED2_G, LED2_B, LED3_R, LED3_G, LED3_B);
   whaleFins.init(SERVO_PIN);
   whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
+  whaleController.init(whaleRGB, whaleSound, whaleFins, whaleEyes);
 
   Serial.println("Started"); 
   Serial.flush();
-  attachInterrupt(digitalPinToInterrupt(PUSHBUTTON_PIN), button_handler, CHANGE);
+  
   //attachInterrupt(digitalPinToInterrupt(PIR_PIN), pir_handler, CHANGE);
-}
-
-void button_handler(){
-  setEmotion(SAD,7000);
-  return;
 }
 
 void getTime(byte* h, byte* m){
@@ -80,22 +69,6 @@ void getTime(byte* h, byte* m){
     *m = now.minute();
 }
 
-bool getState(){
-  if(analogRead(LDR_PIN) > LDR_TRIGGERVALUE) return true;
-  else return false;
-}
-
-//void pir_handler(){
-//  if(digitalRead(PIR_PIN)) presenceDetected = true;
-//  else presenceDetected = false;
-//}
-
-void setEmotion(short emotionIndex, unsigned long int duration){
-  whaleRGB.setEmotion(emotionIndex, duration);
-  whaleEyes.setEmotion(emotionIndex);
-  //whaleFins.setEmotion(emotionIndex);
-  //whaleSound.setEmotion(emotionIndex);
-}
 void setup() {
   Serial.begin(9600);
   hardwareSetup();
