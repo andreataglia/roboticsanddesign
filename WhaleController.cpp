@@ -47,7 +47,7 @@ void WhaleController::initLdr(int pin){
 void WhaleController::initPir(int pin){
 	this->ldr_pin = pin;
 	pinMode(this->pir_pin, INPUT);
-	attachInterrupt(digitalPinToInterrupt(this->pir_pin), buttonChanged, CHANGE);
+	attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
 }
 
 void WhaleController::routine(){

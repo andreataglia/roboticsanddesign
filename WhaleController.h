@@ -6,6 +6,7 @@
 #include "WhaleEyes.h"
 #include "WhaleFins.h"
 #include "WhaleSound.h"
+#include "WhaleRTC.h"
 
 
 class WhaleController
