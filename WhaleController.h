@@ -36,7 +36,6 @@ class WhaleController
     void buttonHandler();
     void pirHandler();
     void setEmotion(short, unsigned long int);
-  
     void initButton(int);
     void initPir(int);
     void initLdr(int);

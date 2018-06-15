@@ -19,6 +19,7 @@ WhaleController::WhaleController(){
 	whaleControllerInstance = this;
 }
 
+
 void WhaleController::init(){
   this->whaleEyes.init();
   whaleRGB.init(LED1_R, LED2_R, LED2_G, LED2_B, LED3_R, LED3_1_G, LED3_1_B);
