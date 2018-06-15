@@ -5,10 +5,13 @@
 
 class WhaleSound
 {
-  public:
-    WhaleSound();
-    void init(short, short);
-    void setEmotion(short);
+  	public:
+    	WhaleSound();
+    	void init(short, short);
+    	void setEmotion(short);
+	private:
+		short speaker_pin;
+		short sd_cs_pin;
 };
 
 #endif

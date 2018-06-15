@@ -103,77 +103,58 @@ bool colorReached, activeEmotion;
 
 
 int REDPIN1;
-int GREENPIN1;
-int BLUEPIN1;
 int REDPIN2;
 int GREENPIN2;
 int BLUEPIN2;
 int REDPIN3;
-int GREENPIN3;
-int BLUEPIN3;
+int GREENPIN3_1;
+int BLUEPIN3_1;
 
 WhaleRGB::WhaleRGB(){}
 
-void WhaleRGB::init(int LED1_R,int LED1_G,int LED1_B,int LED2_R,int LED2_G,int LED2_B,int LED3_R,int LED3_G,int LED3_B){
-  pinMode(LED1_R, OUTPUT);
-  pinMode(LED1_G, OUTPUT);
-  pinMode(LED1_B, OUTPUT);
-  pinMode(LED2_R, OUTPUT);
-  pinMode(LED2_G, OUTPUT);
-  pinMode(LED2_B, OUTPUT);
-  pinMode(LED3_R, OUTPUT);
-  pinMode(LED3_G, OUTPUT);
-  pinMode(LED3_B, OUTPUT);
+void WhaleRGB::init(int LED1_R,int LED2_R,int LED2_G,int LED2_B,int LED3_R,int LED3_G,int LED3_B){
+  
   REDPIN1 = LED1_R;
-  GREENPIN1 = LED1_G;
-  BLUEPIN1 = LED1_B;
   REDPIN2 = LED2_R;
   GREENPIN2 = LED2_G;
   BLUEPIN2 = LED2_B;
   REDPIN3 = LED3_R;
-  GREENPIN3 = LED3_G;
-  BLUEPIN3 = LED3_B;
+  GREENPIN3_1 = LED3_G;
+  BLUEPIN3_1 = LED3_B;
+  pinMode(REDPIN1, OUTPUT);
+  pinMode(REDPIN2, OUTPUT);
+  pinMode(GREENPIN2, OUTPUT);
+  pinMode(BLUEPIN2, OUTPUT);
+  pinMode(REDPIN3, OUTPUT);
+  pinMode(GREENPIN3_1, OUTPUT);
+  pinMode(BLUEPIN3_1, OUTPUT);
 
   calcDifference();
   activeEmotion=false;
   nexttime = 50;
-  TIMSK2 = (1 << TOIE2);
 }
 
-void WhaleRGB::setEmotion(short idx, unsigned long int dur){
-  cli();
+void WhaleRGB::setEmotion(short idx){
   exprIdx=idx;
   strtTransitionIdx = exprIdxStart[exprIdx];
   endTransitionIdx = exprIdxStart[exprIdx]+1;
   for(k=0; k<RGB; k++){
     currentColor[k] = colors[strtTransitionIdx][k];
   }
-  duration = dur;
   activeEmotion = true;
-  sei();
 }
 
 ISR(TIMER2_OVF_vect){
-  if (millis() > nexttime && activeEmotion){
-    //disable Global interrupt in order to prevent other ISR
-    cli();
-    // Serial.print(currentColor[0]);
-    // Serial.print(", ");
-    // Serial.print(currentColor[1]);
-    // Serial.print(", ");
-    // Serial.println(currentColor[2]);
-    // Serial.flush();
+  if (activeEmotion && millis() > nexttime){
       
     //RGB write from the previous color
     analogWrite(REDPIN1, currentColor[0]);
     analogWrite(REDPIN2, currentColor[0]);
     analogWrite(REDPIN3, currentColor[0]);
-    analogWrite(GREENPIN1, currentColor[1]);
-    analogWrite(GREENPIN1, currentColor[1]);
-    analogWrite(GREENPIN3, currentColor[1]);
-    analogWrite(BLUEPIN1, currentColor[2]);
+    analogWrite(GREENPIN2, currentColor[1]);
+    analogWrite(GREENPIN3_1, currentColor[1]);
     analogWrite(BLUEPIN2, currentColor[2]);
-    analogWrite(BLUEPIN3, currentColor[2]);
+    analogWrite(BLUEPIN3_1, currentColor[2]);
       
     // Calculate new color for next ISR
     for(k = 0; k < RGB; k++){
@@ -206,28 +187,23 @@ ISR(TIMER2_OVF_vect){
       for(k=0; k<RGB; k++){
         currentColor[k] = colors[strtTransitionIdx][k];
       }      
-     // Serial.print("\n change ");
-     // Serial.print(strtTransitionIdx);
-     // Serial.println(endTransitionIdx);
-     // Serial.flush();
     } 
     nexttime = millis() + TIMESTEP;
-    duration -= TIMESTEP;
-    if(duration < TIME_THRESH){
-     Serial.println("RGB stopEmotion");
-     Serial.flush();
-      activeEmotion = false;
-      analogWrite(REDPIN1, 0);
-      analogWrite(REDPIN2, 0);
-      analogWrite(REDPIN3, 0);
-      analogWrite(GREENPIN1, 0);
-      analogWrite(GREENPIN1, 0);
-      analogWrite(GREENPIN3, 0);
-      analogWrite(BLUEPIN1, 0);
-      analogWrite(BLUEPIN2, 0);
-      analogWrite(BLUEPIN3, 0);
-    }
-    sei();
+    // duration -= TIMESTEP;
+    // if(duration < TIME_THRESH){
+    // TIMSK2 = (0 << TOIE2);
+    //  Serial.println("RGB stopEmotion");
+    //  Serial.flush();
+    //   activeEmotion = false;
+    //   analogWrite(REDPIN1, 0);
+    //   analogWrite(REDPIN2, 0);
+    //   analogWrite(REDPIN3, 0);
+    //   analogWrite(GREENPIN2, 0);
+    //   analogWrite(GREENPIN3_1, 0);
+    //   analogWrite(BLUEPIN2, 0);
+    //   analogWrite(BLUEPIN3_1, 0);
+    // }
+    
   }
 }
 

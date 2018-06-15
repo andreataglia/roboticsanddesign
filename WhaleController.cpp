@@ -1,43 +1,78 @@
 #include "Arduino.h"
 #include "WhaleController.h"
 
-#define LDR_TRIGGERVALUE 400
+#define ACTIVATION  0
+#define JOY         1
+#define FEAR        2
+#define ANGER       3
+#define SAD         4
+#define DISGUST     5
+#define NEUTRAL     6
+
+int currState;
+bool stateChanged;
+
+#define LDR_TRIGGERVALUE 800
 WhaleController *whaleControllerInstance;
 
 WhaleController::WhaleController(){
 	whaleControllerInstance = this;
 }
 
-void WhaleController::init(WhaleRGB whaleRGB, WhaleSound whaleSound, WhaleFins whaleFins, WhaleEyes whaleEyes){
-  this->whaleRGB = whaleRGB;
-  this->whaleSound = whaleSound;
-  this->whaleFins = whaleFins;
-  this->whaleEyes = whaleEyes;
+void WhaleController::init(){
+  this->whaleEyes.init();
+  whaleRGB.init(LED1_R, LED2_R, LED2_G, LED2_B, LED3_R, LED3_1_G, LED3_1_B);
+  whaleFins.init(SERVO_PIN);
+  this->whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
+  this->whaleRTC.init();
+  this->stopEmotionsTime = 0;
+  currState = 0;
+  stateChanged = false;
+  //BLUETOOTH
+  Serial3.begin(9600);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
 
 void buttonChanged(){
-  if (whaleControllerInstance)
-      whaleControllerInstance->buttonHandler();
+	cli();
+  	if (whaleControllerInstance){
+    	whaleControllerInstance->buttonHandler();
+  	}
+  	sei();
 }
 
 void pirChanged(){
-  if (whaleControllerInstance){
-      whaleControllerInstance->pirHandler();
-  }
+	cli();
+  	if (whaleControllerInstance){
+      	whaleControllerInstance->pirHandler();
+  	}
+  	sei();
 }
 
 //////////////////////// Methods ////////////////////////////////////////////////////////
 
 void WhaleController::setEmotion(short emotion, unsigned long int duration){
-	whaleRGB.setEmotion(emotion, duration);
+	// whaleEyes.setEmotion(emotion);
+	// whaleRGB.setEmotion(emotion);
+	whaleFins.setEmotion(emotion);
+	// TIMSK2 = (1 << TOIE2);
+	// TIMSK3 = (1 << TOIE3);
+	this->stopEmotionsTime = millis() + duration;
+}
+
+void WhaleController::stopEmotions(){
+	// whaleRGB.setEmotion(emotion, duration);
+	// whaleEyes.setEmotion(emotion);
+	// whaleFins.setEmotion(emotion);
+	// TIMSK2 = (0 << TOIE2);
+	// TIMSK3 = (0 << TOIE3);
 }
 
 void WhaleController::initButton(int pin){
 	this->btn_pin = pin;
-	pinMode(this->btn_pin, OUTPUT);
-	attachInterrupt(digitalPinToInterrupt(this->btn_pin), buttonChanged, CHANGE);
+	pinMode(this->btn_pin, INPUT);
+	attachInterrupt(digitalPinToInterrupt(this->btn_pin), buttonChanged, RISING);
 }
 
 void WhaleController::initLdr(int pin){
@@ -45,24 +80,56 @@ void WhaleController::initLdr(int pin){
 }
 
 void WhaleController::initPir(int pin){
-	this->ldr_pin = pin;
+	this->pir_pin = pin;
 	pinMode(this->pir_pin, INPUT);
 	attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
 }
 
 void WhaleController::routine(){
-  if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
-  	//TODO
-  }
+	if(stateChanged){
+	    setEmotion(currState, 000);
+	    stateChanged = false;
+	}
+	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
+		cli();
+	    this->stopEmotions();
+		sei();
+	}
+	if (Serial3.available()){
+	   	String data = Serial3.readStringUntil('\n'); 
+		if(data != NULL){	
+			Serial3.println("ciao! 1:set bed time, 2: set wakeup time, 3: show bedtime, 4:show wakeup time");
+	   		Serial3.println(data);
+	   		if(data=="1,20\n"){  
+	    		Serial3.println("perfetto");
+	    		// this->setEmotion(4, 2000);
+	   		}
+		}
+	}
+	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
+	  	// Serial.println(analogRead(this->ldr_pin));
+	  	Serial.println(currState);
+		currState++;
+		if(currState == 8){
+		    currState = 0;
+		}
+	}
 }
 
 void WhaleController::buttonHandler(){
-  this->setEmotion(3, 1000);
+	Serial.println(currState);
+	currState++;
+	if(currState == 8){
+	    currState = 0;
+	}
+	stateChanged = true;
 }
 
 void WhaleController::pirHandler(){
   	if(digitalRead(this->pir_pin)){
-		//TODO
+		Serial.println("ciao mbare");
+ 	}else{
+ 		Serial.println("niente...");
  	}
 }
 

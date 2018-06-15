@@ -6,12 +6,9 @@
 
 #define NUMSOUNDS 6
 
-short SPEAKER_PIN;
-short SD_CS_PIN;
-
 TMRpcm audioPlayer;
 
-String playedSound = ".wav";
+char* playedSound = ".wav";
 int soundLenght[NUMSOUNDS] = {
 	1000,		//Activation
 	10000,	//Joy
@@ -24,15 +21,15 @@ int soundLenght[NUMSOUNDS] = {
 WhaleSound::WhaleSound(){}
 
 void WhaleSound::init(short speaker, short sd){
-	SPEAKER_PIN = speaker;
-	SD_CS_PIN = sd;
+	this->speaker_pin = speaker;
+	this->sd_cs_pin = sd;
 
 	//SD
 	if(!SD.begin(49)) { 
 		Serial.println("SD fail");
 	}
   	//Audio Starts
-	audioPlayer.speakerPin = SPEAKER_PIN; 
+	audioPlayer.speakerPin = this->speaker_pin; 
 	audioPlayer.setVolume(7);
  	audioPlayer.quality(0);
 }
@@ -42,6 +39,6 @@ void WhaleSound::setEmotion(short idx){
 		audioPlayer.disable();
 
 	playedSound = idx + playedSound;
-  audioPlayer.play("playedSound");
+  	audioPlayer.play("1.wav");
 }
 

@@ -12,7 +12,6 @@ class WhaleFins
     void setEmotion(short);
   private:
     int _pin;
-    Servo myservo;
 };
 
 #endif
