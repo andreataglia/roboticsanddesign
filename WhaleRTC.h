@@ -8,7 +8,8 @@ class WhaleRTC
   public:
     WhaleRTC();
     void init();
-    void getTime(byte*, byte*);
+    byte getCurrMinute();
+    byte getCurrHour();
 };
 
 #endif

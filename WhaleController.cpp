@@ -21,16 +21,18 @@ WhaleController::WhaleController(){
 
 
 void WhaleController::init(){
-  this->whaleEyes.init();
+  whaleEyes.init();
   whaleRGB.init(LED1_R, LED2_R, LED2_G, LED2_B, LED3_R, LED3_1_G, LED3_1_B);
   whaleFins.init(SERVO_PIN);
-  this->whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
-  this->whaleRTC.init();
-  this->stopEmotionsTime = 0;
+  whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
+  whaleRTC.init();
+  stopEmotionsTime = 0;
   currState = 0;
   stateChanged = false;
   //BLUETOOTH
   Serial3.begin(9600);
+
+  whaleEyes.setEmotion(NEUTRAL);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
@@ -54,11 +56,11 @@ void pirChanged(){
 //////////////////////// Methods ////////////////////////////////////////////////////////
 
 void WhaleController::setEmotion(short emotion, unsigned long int duration){
-	// whaleEyes.setEmotion(emotion);
-	// whaleRGB.setEmotion(emotion);
+	whaleEyes.setEmotion(emotion);
+	whaleRGB.setEmotion(emotion);
 	whaleFins.setEmotion(emotion);
-	// TIMSK2 = (1 << TOIE2);
-	// TIMSK3 = (1 << TOIE3);
+	TIMSK2 = (1 << TOIE2);
+	TIMSK3 = (1 << TOIE3);
 	this->stopEmotionsTime = millis() + duration;
 }
 
@@ -66,8 +68,8 @@ void WhaleController::stopEmotions(){
 	// whaleRGB.setEmotion(emotion, duration);
 	// whaleEyes.setEmotion(emotion);
 	// whaleFins.setEmotion(emotion);
-	// TIMSK2 = (0 << TOIE2);
-	// TIMSK3 = (0 << TOIE3);
+	TIMSK2 = (0 << TOIE2);
+	TIMSK3 = (0 << TOIE3);
 }
 
 void WhaleController::initButton(int pin){
@@ -86,9 +88,28 @@ void WhaleController::initPir(int pin){
 	attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
 }
 
+void WhaleController::buttonHandler(){
+	Serial.println(currState);
+	currState++;
+	if(currState > 6){
+	    currState = 0;
+	}
+	stateChanged = true;
+}
+
+void WhaleController::pirHandler(){
+  	if(digitalRead(this->pir_pin)){
+		Serial.println("ciao mbare");
+ 	}else{
+ 		Serial.println("niente...");
+ 	}
+}
+
 void WhaleController::routine(){
+	Serial.println(whaleRTC.getCurrMinute());
+	Serial.println(whaleRTC.getCurrHour());
 	if(stateChanged){
-	    setEmotion(currState, 000);
+	    setEmotion(currState, 4500);
 	    stateChanged = false;
 	}
 	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
@@ -107,30 +128,12 @@ void WhaleController::routine(){
 	   		}
 		}
 	}
-	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
-	  	// Serial.println(analogRead(this->ldr_pin));
-	  	Serial.println(currState);
-		currState++;
-		if(currState == 8){
-		    currState = 0;
-		}
-	}
+	// if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
+	//   	// Serial.println(analogRead(this->ldr_pin));
+	//   	Serial.println("pir changed");
+	// 	currState++;
+	// 	if(currState > 6){
+	// 	    currState = 0;
+	// 	}
+	// }
 }
-
-void WhaleController::buttonHandler(){
-	Serial.println(currState);
-	currState++;
-	if(currState == 8){
-	    currState = 0;
-	}
-	stateChanged = true;
-}
-
-void WhaleController::pirHandler(){
-  	if(digitalRead(this->pir_pin)){
-		Serial.println("ciao mbare");
- 	}else{
- 		Serial.println("niente...");
- 	}
-}
-

@@ -13,13 +13,17 @@ void WhaleRTC::init(){
     Serial.flush();
   }  
   if (! rtc.initialized()) {
-    Serial.println("RTC is NOT running!");
+    Serial.println("RTC has not been initialized and thus is NOT running!");
+    // following line sets the RTC to the date & time from the computer the sketch comes from
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
     Serial.flush();
   }
 }
 
-void WhaleRTC::getTime(byte* h, byte* m){
-    DateTime now = rtc.now();
-    *h = now.hour();
-    *m = now.minute();
+byte WhaleRTC::getCurrHour(){
+    return rtc.now().hour();
+}
+
+byte WhaleRTC::getCurrMinute(){
+    return rtc.now().minute();
 }
