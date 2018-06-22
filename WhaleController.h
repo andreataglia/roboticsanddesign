@@ -45,6 +45,7 @@ class WhaleController
     int btn_pin;
     int pir_pin;
     int ldr_pin;
+    int pirState;
     unsigned long int stopEmotionsTime;
     WhaleEyes whaleEyes;
     WhaleRGB whaleRGB;

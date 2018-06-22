@@ -85,7 +85,7 @@ void WhaleController::initLdr(int pin){
 void WhaleController::initPir(int pin){
 	this->pir_pin = pin;
 	pinMode(this->pir_pin, INPUT);
-	attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
+	// attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
 }
 
 void WhaleController::buttonHandler(){
@@ -97,17 +97,15 @@ void WhaleController::buttonHandler(){
 	stateChanged = true;
 }
 
-void WhaleController::pirHandler(){
-  	if(digitalRead(this->pir_pin)){
-		Serial.println("ciao mbare");
- 	}else{
- 		Serial.println("niente...");
- 	}
-}
+// void WhaleController::pirHandler(){
+//   	if(digitalRead(this->pir_pin)){
+// 		Serial.println("ciao mbare");
+//  	}else{
+//  		Serial.println("niente...");
+//  	}
+// }
 
 void WhaleController::routine(){
-	Serial.println(whaleRTC.getCurrMinute());
-	Serial.println(whaleRTC.getCurrHour());
 	if(stateChanged){
 	    setEmotion(currState, 4500);
 	    stateChanged = false;
@@ -128,9 +126,26 @@ void WhaleController::routine(){
 	   		}
 		}
 	}
+	//check PIR
+	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
+	    if (pirState == LOW) {
+	      // we have just turned on
+	    	// Serial.println("Motion detected!");
+	    	currState++;
+	    	stateChanged=true;
+	      // We only want to print on the output change, not state
+	      	pirState = HIGH;
+	    }
+	} else {
+	    if (pirState == HIGH){
+	      	// We only want to print on the output change, not state
+	    	pirState = LOW;
+	    }
+	}
+
+	//check LDR
 	// if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
 	//   	// Serial.println(analogRead(this->ldr_pin));
-	//   	Serial.println("pir changed");
 	// 	currState++;
 	// 	if(currState > 6){
 	// 	    currState = 0;
