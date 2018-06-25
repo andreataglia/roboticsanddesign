@@ -23,5 +23,6 @@ void loop() {
   // whaleController.setEmotion(4, 10000);
   // delay(15000);
   // whaleController.setEmotion(5, 10000);
-  // whaleController.routine();
+  delay(1000);
+  whaleController.routine();
 }

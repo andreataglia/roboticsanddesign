@@ -5,7 +5,7 @@ int currState;
 bool stateChanged;
 
 
-#define LDR_TRIGGERVALUE 800
+#define LDR_TRIGGERVALUE 800 //the higher the darker
 WhaleController *whaleControllerInstance;
 
 //Wrapper function for ISR
@@ -20,7 +20,7 @@ void WhaleController::init(){
   whaleFins.init(SERVO_PIN);
   whaleSound.init();
   whaleRTC.init();
-  // whaleFSM.init(this);
+  whaleFSM.init(this);
   stopEmotionsTime = 0;
   currState = 0;
   stateChanged = false;
@@ -83,6 +83,7 @@ void WhaleController::initPir(int pin){
 }
 
 void WhaleController::buttonHandler(){
+	whaleFSM.buttonPressed();
 	Serial.println(currState);
 	currState++;
 	if(currState > 6){
@@ -100,15 +101,15 @@ void WhaleController::buttonHandler(){
 // }
 
 void WhaleController::routine(){
-	if(stateChanged){
-	    setEmotion(currState, 4500);
-	    stateChanged = false;
-	}
+	//check emotion time has elapsed
 	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
 		cli();
 	    this->stopEmotions();
+	    whaleFSM.emotionIsOver();
 		sei();
 	}
+
+	//check bluetooth data in
 	if (Serial3.available()){
 	   	String data = Serial3.readStringUntil('\n'); 
 		if(data != NULL){	
@@ -120,13 +121,12 @@ void WhaleController::routine(){
 	   		}
 		}
 	}
+
 	//check PIR
 	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
 	    if (pirState == LOW) {
 	      // we have just turned on
-	    	// Serial.println("Motion detected!");
-	    	currState++;
-	    	stateChanged=true;
+	      	whaleFSM.motionDetected();
 	      // We only want to print on the output change, not state
 	      	pirState = HIGH;
 	    }
@@ -138,11 +138,7 @@ void WhaleController::routine(){
 	}
 
 	//check LDR
-	// if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
-	//   	// Serial.println(analogRead(this->ldr_pin));
-	// 	currState++;
-	// 	if(currState > 6){
-	// 	    currState = 0;
-	// 	}
-	// }
+	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
+		whaleFSM.lightOff();
+	}
 }

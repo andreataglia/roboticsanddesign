@@ -7,7 +7,7 @@
 #include "WhaleFins.h"
 #include "WhaleSound.h"
 #include "WhaleRTC.h"
-// #include "WhaleFSM.h"
+#include "WhaleFSM.h"
 
 #define PIR_PIN           19
 #define PUSHBUTTON_PIN    18
@@ -51,7 +51,7 @@ class WhaleController
     WhaleFins whaleFins;
     WhaleSound whaleSound;
     WhaleRTC whaleRTC;
-    // WhaleFSM whaleFSM;
+    WhaleFSM whaleFSM;
 };
 
 #endif
