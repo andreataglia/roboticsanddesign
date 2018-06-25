@@ -32,7 +32,7 @@ void WhaleFins::setEmotion(short idx)
   	servo.write(0);   
 }
 
-ISR(TIMER3_OVF_vect){
+ISR(TIMER4_OVF_vect){
   if (millis() > nextServoMove){    
     servo.write(angles[currEmotionIndex] - angles[currEmotionIndex] * servoClockwise);
 		servoClockwise = 1 - servoClockwise;  

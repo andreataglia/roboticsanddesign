@@ -7,12 +7,11 @@
 #include "WhaleFins.h"
 #include "WhaleSound.h"
 #include "WhaleRTC.h"
+// #include "WhaleFSM.h"
 
-#define SPEAKER_PIN       5
 #define PIR_PIN           19
 #define PUSHBUTTON_PIN    18
 #define LDR_PIN           A0
-#define SD_CS_PIN         49
 #define SERVO_PIN         46
 
 #define LED1_R            13
@@ -52,6 +51,7 @@ class WhaleController
     WhaleFins whaleFins;
     WhaleSound whaleSound;
     WhaleRTC whaleRTC;
+    // WhaleFSM whaleFSM;
 };
 
 #endif

@@ -7,11 +7,9 @@ class WhaleSound
 {
   	public:
     	WhaleSound();
-    	void init(short, short);
+    	void init();
     	void setEmotion(short);
 	private:
-		short speaker_pin;
-		short sd_cs_pin;
 };
 
 #endif

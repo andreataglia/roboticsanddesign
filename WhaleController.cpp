@@ -1,20 +1,14 @@
 #include "Arduino.h"
 #include "WhaleController.h"
 
-#define ACTIVATION  0
-#define JOY         1
-#define FEAR        2
-#define ANGER       3
-#define SAD         4
-#define DISGUST     5
-#define NEUTRAL     6
-
 int currState;
 bool stateChanged;
+
 
 #define LDR_TRIGGERVALUE 800
 WhaleController *whaleControllerInstance;
 
+//Wrapper function for ISR
 WhaleController::WhaleController(){
 	whaleControllerInstance = this;
 }
@@ -24,15 +18,14 @@ void WhaleController::init(){
   whaleEyes.init();
   whaleRGB.init(LED1_R, LED2_R, LED2_G, LED2_B, LED3_R, LED3_1_G, LED3_1_B);
   whaleFins.init(SERVO_PIN);
-  whaleSound.init(SPEAKER_PIN, SD_CS_PIN);
+  whaleSound.init();
   whaleRTC.init();
+  // whaleFSM.init(this);
   stopEmotionsTime = 0;
   currState = 0;
   stateChanged = false;
   //BLUETOOTH
   Serial3.begin(9600);
-
-  whaleEyes.setEmotion(NEUTRAL);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
@@ -45,13 +38,13 @@ void buttonChanged(){
   	sei();
 }
 
-void pirChanged(){
-	cli();
-  	if (whaleControllerInstance){
-      	whaleControllerInstance->pirHandler();
-  	}
-  	sei();
-}
+// void pirChanged(){
+// 	cli();
+//   	if (whaleControllerInstance){
+//       	whaleControllerInstance->pirHandler();
+//   	}
+//   	sei();
+// }
 
 //////////////////////// Methods ////////////////////////////////////////////////////////
 
@@ -59,8 +52,9 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 	whaleEyes.setEmotion(emotion);
 	whaleRGB.setEmotion(emotion);
 	whaleFins.setEmotion(emotion);
+	whaleSound.setEmotion(emotion);
 	TIMSK2 = (1 << TOIE2);
-	TIMSK3 = (1 << TOIE3);
+	TIMSK4 = (1 << TOIE4);
 	this->stopEmotionsTime = millis() + duration;
 }
 
@@ -69,7 +63,7 @@ void WhaleController::stopEmotions(){
 	// whaleEyes.setEmotion(emotion);
 	// whaleFins.setEmotion(emotion);
 	TIMSK2 = (0 << TOIE2);
-	TIMSK3 = (0 << TOIE3);
+	TIMSK4 = (0 << TOIE4);
 }
 
 void WhaleController::initButton(int pin){

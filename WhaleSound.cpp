@@ -1,14 +1,11 @@
 #include "Arduino.h"
 #include "WhaleSound.h"
-#include <SD.h>
-#include <SPI.h>
-#include <TMRpcm.h>
+#include "DFRobotDFPlayerMini.h"
 
 #define NUMSOUNDS 6
 
-TMRpcm audioPlayer;
+DFRobotDFPlayerMini audioPlayer;
 
-char* playedSound = ".wav";
 int soundLenght[NUMSOUNDS] = {
 	1000,		//Activation
 	10000,	//Joy
@@ -20,25 +17,20 @@ int soundLenght[NUMSOUNDS] = {
 
 WhaleSound::WhaleSound(){}
 
-void WhaleSound::init(short speaker, short sd){
-	this->speaker_pin = speaker;
-	this->sd_cs_pin = sd;
-
-	//SD
-	if(!SD.begin(49)) { 
-		Serial.println("SD fail");
-	}
-  	//Audio Starts
-	audioPlayer.speakerPin = this->speaker_pin; 
-	audioPlayer.setVolume(7);
- 	audioPlayer.quality(0);
+void WhaleSound::init(){
+ 	Serial2.begin(9600);
+ 	if (!audioPlayer.begin(Serial2)) {  //Use softwareSerial to communicate with mp3.
+  		Serial.println(F("Unable to begin:"));
+    	Serial.println(F("1.Please recheck the connection!"));
+    	Serial.println(F("2.Please insert the SD card!"));
+    	while(true);
+  	}
+  	Serial.println(F("DFPlayer Mini online."));
+  
+  	audioPlayer.volume(30);  //Set volume value. From 0 to 30
 }
 
 void WhaleSound::setEmotion(short idx){
-	if(audioPlayer.isPlaying())
-		audioPlayer.disable();
-
-	playedSound = idx + playedSound;
-  	audioPlayer.play("1.wav");
+	audioPlayer.play(idx);  //Play mp3 by position
 }
 
