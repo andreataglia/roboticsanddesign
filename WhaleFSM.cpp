@@ -133,30 +133,34 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
         break;
 
       case JOY_WOKEUP:
-        currGlobalState == IDLESTATE;
-        currState = IDLE;
         *nextEmotion = OFF;
         *nextEmotion = 5 * MINUTE; //Robots has to go off till morning
+        currState = IDLE;
+        currGlobalState == IDLESTATE;
         break;
     }
   }
 
   else if(currGlobalState == IDLESTATE){
-    currState = IDLE;
     *nextEmotion = OFF;
     *nextEmotion = 20 * MINUTE; //Robots has to go off till morning
+    currState = IDLE;
   }
 }
 
 
 void WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuration){
 	if(currGlobalState == SLEEPSTATE && (currState == NEUTRAL_IR || currState == FEAR)){
+    *nextEmotion = JOY;
+    *nextDuration = 4000;
   	currState = JOY_IR;
-  	*nextEmotion = JOY;
-  	*nextDuration = 4000;
   }
 
   else if(currGlobalState == WAKEUPSTATE && currState == NEUTRAL_IR){
+    *nextEmotion = JOY;
+    *nextDuration = 10000;
+    currState = JOY_IR;
+  }
   
   Serial.println(currState);
 }
@@ -164,10 +168,10 @@ void WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuratio
 
 void WhaleFSM::lightOff(short* nextEmotion, unsigned long int* nextDuration){
   if(currGlobalState == SLEEPSTATE && currState == NEUTRAL_LIGHT){
-  	currGlobalState == IDLESTATE;
-  	currState = IDLE;
     *nextEmotion = OFF;
     *nextEmotion = 5 * MINUTE; //Robots has to go off till morning
+    currState = IDLE;
+  	currGlobalState == IDLESTATE;
   }
   Serial.println(currState);
 }
@@ -196,9 +200,9 @@ void WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration
 void WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration){
     currGlobalState = newState;
     if(newState == SLEEPSTATE){
+      *nextEmotion = OFF;
+      *nextDuration = 0.1 * MINUTE;
     	currState = IDLE;
-    	*nextEmotion = OFF;
-    	*nextDuration = 0.1 * MINUTE;
     }
     Serial.println(currState);
 }
