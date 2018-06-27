@@ -21,8 +21,8 @@ byte currentColor[RGB] = {0,0,0};
  */
 byte colors[NUMCOLOR][RGB] = {
   //Activation
-  {60,60,60},//0
-  {255,255,255},//1
+  {0,0,0},//0
+  {0,0,0},//1
   //JOY
   {0, 255, 0},//2
   {0, 255, 255},//3
@@ -62,8 +62,8 @@ byte colors[NUMCOLOR][RGB] = {
   {80,80,80},//32
 };
 int fadeTime[NUMCOLOR] = {
-  //Activation index=0
-  1000, 1000,
+  //off index=0
+  10000, 10000,
   //JOY index=2
   1000,1000,1000,1000,1000,1000,1000,1000,1000,
   //FEAR index=11
@@ -189,21 +189,6 @@ ISR(TIMER2_OVF_vect){
       }      
     } 
     nexttime = millis() + TIMESTEP;
-    // duration -= TIMESTEP;
-    // if(duration < TIME_THRESH){
-    // TIMSK2 = (0 << TOIE2);
-    //  Serial.println("RGB stopEmotion");
-    //  Serial.flush();
-    //   activeEmotion = false;
-    //   analogWrite(REDPIN1, 0);
-    //   analogWrite(REDPIN2, 0);
-    //   analogWrite(REDPIN3, 0);
-    //   analogWrite(GREENPIN2, 0);
-    //   analogWrite(GREENPIN3_1, 0);
-    //   analogWrite(BLUEPIN2, 0);
-    //   analogWrite(BLUEPIN3_1, 0);
-    // }
-    
   }
 }
 
@@ -211,21 +196,10 @@ ISR(TIMER2_OVF_vect){
 void WhaleRGB::calcDifference(){
   for(i=0; i<EXPRESSIONS; i++){
     for(j=exprIdxStart[i]; j<exprIdxEnd[i]; j++){
-      for(k=0; k<RGB; k++){
+      for(k=0; k<RGB; k++)
         difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[j+1][k]) * (int)TIMESTEP) / fadeTime[j]);
-       // Serial.print(difference[j][k]);
-       // Serial.print(',');
-      }
-     // Serial.println(' ');
-     // Serial.flush();
     }
-    for(k=0; k<RGB; k++){
+    for(k=0; k<RGB; k++)
       difference[j][k] = round((float)(abs((int)colors[j][k] - (int)colors[exprIdxStart[i]][k]) * TIMESTEP) / fadeTime[j]);
-     // Serial.print(difference[j][k]);
-     // Serial.print(',');
-    }
-   // Serial.println(' ');
-   // Serial.flush();
   }
- // Serial.println("---\n");
 }

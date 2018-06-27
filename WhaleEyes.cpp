@@ -10,15 +10,15 @@ Adafruit_8x8matrix leftEye = Adafruit_8x8matrix();
 Adafruit_8x8matrix rightEye = Adafruit_8x8matrix();
 
 uint8_t
-  activation_bpm[]=
+  off_bpm[]=
   { B00000000,
-    B00011000,
-    B01100110,
-    B01000010,
-    B10011001,
-    B00011000,
     B00000000,
-    B00000000 },
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000,
+    B00000000},
 //JOY
   joy_bpm[]=
   { B00000000,
@@ -126,7 +126,7 @@ uint8_t
     B00000000 };
 
 uint8_t* bpmIdx[EXPRESSIONS*2] = {
-  &activation_bpm[0], &activation_bpm[0],
+  &off_bpm[0], &off_bpm[0],
   &joy_bpm[0], &joy_bpm[0],
   &fearLeft_bmp[0], &fearRight_bmp[0],
   &angerLeft_bpm[0], &angerRight_bpm[0],

@@ -7,6 +7,7 @@
 #define IDLESTATE 		102
 
 //Emotions
+#define OFF 					0
 #define JOY         	1
 #define FEAR        	2
 #define ANGER       	3
@@ -128,7 +129,7 @@ void WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long 
     currGlobalState = newState;
     if(newState == SLEEPSTATE){
     	currState = IDLE;
-    	*nextEmotion = NEUTRAL;
+    	*nextEmotion = OFF;
     	*nextDuration = 0.05 * MINUTE;
     }
     Serial.println(currState);
