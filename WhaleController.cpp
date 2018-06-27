@@ -28,6 +28,8 @@ void WhaleController::init(){
   antiBounceDuration = millis();
   //BLUETOOTH
   Serial3.begin(9600);
+  initButton(PUSHBUTTON_PIN);
+  initPir(PIR_PIN);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
