@@ -14,6 +14,10 @@ class WhaleRTC
 	void setBedTimeMinute(byte);
 	byte getBedTimeHour();
 	byte getBedTimeMinute();
+	void setWakeupTimeHour(byte);
+	void setWakeupTimeMinute(byte);
+	byte getWakeupTimeHour();
+	byte getWakeupTimeMinute();
 };
 
 #endif

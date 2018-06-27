@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "WhaleController.h"
 
-bool stateChanged;
+bool emotionChanged;
 
 #define LDR_TRIGGERVALUE 700 //the higher the darker
 WhaleController *whaleControllerInstance;
@@ -19,7 +19,7 @@ void WhaleController::init(){
   whaleRTC.init();
   whaleFSM.init();
   stopEmotionsTime = 0;
-  stateChanged = false;
+  emotionChanged = false;
   nextEmotion = 0;
   nextDuration = 1000;
   antiBounceDuration = millis();
@@ -27,8 +27,13 @@ void WhaleController::init(){
   Serial3.begin(9600);
   initButton(PUSHBUTTON_PIN);
   initPir(PIR_PIN);
+  //set the whale to stay off
+  whaleFSM.setGlobalState(102, &nextEmotion, &nextDuration);
+  setEmotion(0, 100000);
+  //DEBUG ONLY
+  delay(3000);
+  emotionChanged = true;
   whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
-  setEmotion(6, 10000);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
@@ -45,14 +50,9 @@ void WhaleController::buttonHandler(){
 	if(millis() - 1000 > antiBounceDuration){
 		antiBounceDuration = millis();
 		Serial.println(whaleRTC.getBedTimeMinute());
-		stateChanged = true;
+		emotionChanged = true;
 		whaleFSM.buttonPressed(&nextEmotion, &nextDuration);
 	}
-	
-	// currState++;
-	// if(currState > 6){
-	//     currState = 0;
-	// }
 }
 
 // void pirChanged(){
@@ -76,9 +76,6 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 }
 
 void WhaleController::stopEmotions(){
-	// whaleRGB.setEmotion(emotion, duration);
-	// whaleEyes.setEmotion(emotion);
-	// whaleFins.setEmotion(emotion);
 	TIMSK2 = (0 << TOIE2);
 	TIMSK4 = (0 << TOIE4);
 }
@@ -101,8 +98,8 @@ void WhaleController::initPir(int pin){
 
 void WhaleController::routine(){
 	//check if we have to change emotion
-	if(stateChanged){
-		stateChanged=false;
+	if(emotionChanged){
+		emotionChanged=false;
 	    setEmotion(nextEmotion, nextDuration);
 	}
 
@@ -110,7 +107,7 @@ void WhaleController::routine(){
 	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
 		cli();
 	    this->stopEmotions();
-	    stateChanged=true;
+	    emotionChanged=true;
 	    whaleFSM.emotionIsOver(&nextEmotion, &nextDuration);
 		sei();
 	}
@@ -119,7 +116,7 @@ void WhaleController::routine(){
 	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
 	    if (pirState == LOW) {
 	      // we have just turned on
-			stateChanged = true;
+			emotionChanged = true;
 			whaleFSM.motionDetected(&nextEmotion, &nextDuration);
 	      // We only want to print on the output change, not state
 	      	pirState = HIGH;
@@ -133,7 +130,7 @@ void WhaleController::routine(){
 
 	//check LDR
 	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
-		stateChanged = true;
+		emotionChanged = true;
 		whaleFSM.lightOff(&nextEmotion, &nextDuration);
 	}
 }
@@ -154,8 +151,10 @@ void WhaleController::secondaryRoutine(){
 
 	//check bed and wakeup times
 	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
+	    emotionChanged = true;
 	    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
-	}else if(false){
+	}else if(whaleRTC.getCurrHour() == whaleRTC.getWakeupTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getWakeupTimeMinute()){
+		emotionChanged = true;
 		whaleFSM.setGlobalState(101, &nextEmotion, &nextDuration);
-	}
+	}//FSM will be in charge of getting back to OFF state (i.e. 102)
 }

@@ -6,8 +6,6 @@ void setup() {
   Serial.begin(9600);
 
   whaleController.init();
-  whaleController.initButton(PUSHBUTTON_PIN);
-  whaleController.initPir(PIR_PIN);
 
   Serial.println("Started"); 
   Serial.flush();

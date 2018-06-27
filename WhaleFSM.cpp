@@ -116,7 +116,7 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
 
   		case IDLE:
 				*nextEmotion = NEUTRAL;
-  			*nextDuration = 5 * MINUTE;
+  			*nextDuration = 0.05 * MINUTE;
   			currState = NEUTRAL_IR;
   			break;
 		}
@@ -129,8 +129,9 @@ void WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long 
     if(newState == SLEEPSTATE){
     	currState = IDLE;
     	*nextEmotion = NEUTRAL;
-    	*nextDuration = 1 * MINUTE;
+    	*nextDuration = 0.05 * MINUTE;
     }
+    Serial.println(currState);
 }
 
 

@@ -7,6 +7,8 @@ RTC_PCF8523 rtc;
 
 #define bedTimeMinuteAddress 0
 #define bedTimeHourAddress 1
+#define wakeupTimeMinuteAddress 2
+#define wakeupTimeHourAddress 3
 
 WhaleRTC::WhaleRTC(){}
 
@@ -45,4 +47,20 @@ byte WhaleRTC::getBedTimeMinute(){
 
 byte WhaleRTC::getBedTimeHour(){
   return EEPROM.read(bedTimeHourAddress);
+}
+
+void WhaleRTC::setWakeupTimeMinute(byte val){
+  EEPROM.write(wakeupTimeMinuteAddress, val);
+}
+
+void WhaleRTC::setWakeupTimeHour(byte val){
+  EEPROM.write(wakeupTimeHourAddress, val);
+}
+
+byte WhaleRTC::getWakeupTimeMinute(){
+  return EEPROM.read(wakeupTimeMinuteAddress);
+}
+
+byte WhaleRTC::getWakeupTimeHour(){
+  return EEPROM.read(wakeupTimeHourAddress);
 }
