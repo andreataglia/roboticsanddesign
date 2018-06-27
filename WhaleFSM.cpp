@@ -19,13 +19,12 @@
 
 WhaleFSM::WhaleFSM(){}
 
-void WhaleFSM::init(const WhaleController* wc){
-  whaleController = wc;
+void WhaleFSM::init(){
   currGlobalState = WAKEUPSTATE;
   currState = 0;
 }
 
-void WhaleFSM::motionDetected(){
+void WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuration){
     // switch (currGlobalState) {
     //     case SLEEPSTATE:
     //       switch (currState) {
@@ -60,17 +59,29 @@ void WhaleFSM::motionDetected(){
     //     default:
     //       do something
     // }
+    *nextEmotion = 3;
+    *nextDuration = 5000;
 }
 
-void WhaleFSM::lightOff(){
+void WhaleFSM::lightOff(short* nextEmotion, unsigned long int* nextDuration){
     //TODO
+    *nextEmotion = FEAR;
+    *nextDuration = 9000;
 }
 
-void WhaleFSM::buttonPressed(){
+void WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration){
     //TODO
+    *nextEmotion = 4;
+    *nextDuration = 5000;
 }
 
 
-void WhaleFSM::emotionIsOver(){
+void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration){
+    *nextEmotion = ANGER;
+    *nextDuration = 10000;
   //TODO
+}
+
+void WhaleFSM::setGlobalState(short newState){
+    currGlobalState = newState;
 }

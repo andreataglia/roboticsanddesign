@@ -10,6 +10,10 @@ class WhaleRTC
     void init();
     byte getCurrMinute();
     byte getCurrHour();
+	void setBedTimeHour(byte);
+	void setBedTimeMinute(byte);
+	byte getBedTimeHour();
+	byte getBedTimeMinute();
 };
 
 #endif

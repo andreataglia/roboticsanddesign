@@ -1,9 +1,12 @@
 #include "Arduino.h"
 #include "WhaleRTC.h"
-
 #include "RTClib.h"
+#include <EEPROM.h>
 
 RTC_PCF8523 rtc;
+
+#define bedTimeMinuteAddress 0
+#define bedTimeHourAddress 1
 
 WhaleRTC::WhaleRTC(){}
 
@@ -26,4 +29,20 @@ byte WhaleRTC::getCurrHour(){
 
 byte WhaleRTC::getCurrMinute(){
     return rtc.now().minute();
+}
+
+void WhaleRTC::setBedTimeMinute(byte val){
+  EEPROM.write(bedTimeMinuteAddress, val);
+}
+
+void WhaleRTC::setBedTimeHour(byte val){
+  EEPROM.write(bedTimeHourAddress, val);
+}
+
+byte WhaleRTC::getBedTimeMinute(){
+  return EEPROM.read(bedTimeMinuteAddress);
+}
+
+byte WhaleRTC::getBedTimeHour(){
+  return EEPROM.read(bedTimeHourAddress);
 }

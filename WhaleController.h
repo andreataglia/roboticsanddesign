@@ -39,6 +39,7 @@ class WhaleController
     void initPir(int);
     void initLdr(int);
     void routine();
+    void secondaryRoutine();
   private:
     void stopEmotions();
     int btn_pin;
@@ -52,6 +53,9 @@ class WhaleController
     WhaleSound whaleSound;
     WhaleRTC whaleRTC;
     WhaleFSM whaleFSM;
+    short nextEmotion;
+    unsigned long int nextDuration;
+    unsigned long int antiBounceDuration;
 };
 
 #endif

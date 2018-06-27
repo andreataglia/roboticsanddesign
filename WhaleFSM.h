@@ -2,21 +2,20 @@
 #define WhaleFSM_h
 
 #include "Arduino.h"
-#include "WhaleController.h"
 
 class WhaleFSM
 {
   	public:
 	    WhaleFSM();
-	    void init(const WhaleController*);
-	    void motionDetected();
-	    void lightOff();
-	    void buttonPressed();
-	    void emotionIsOver();
+	    void init();
+	    void motionDetected(short* nextEmotion, unsigned long int* nextDuration);
+	    void lightOff(short* nextEmotion, unsigned long int* nextDuration);
+	    void buttonPressed(short* nextEmotion, unsigned long int* nextDuration);
+	    void emotionIsOver(short* nextEmotion, unsigned long int* nextDuration);
+	    void setGlobalState(short);
 	private:
 		short currState;
 		short currGlobalState;
-		WhaleController *whaleController;
 };
 
 #endif
