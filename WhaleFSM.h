@@ -12,7 +12,7 @@ class WhaleFSM
 	    void lightOff(short* nextEmotion, unsigned long int* nextDuration);
 	    void buttonPressed(short* nextEmotion, unsigned long int* nextDuration);
 	    void emotionIsOver(short* nextEmotion, unsigned long int* nextDuration);
-	    void setGlobalState(short);
+	    void setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration);
 	private:
 		short currState;
 		short currGlobalState;

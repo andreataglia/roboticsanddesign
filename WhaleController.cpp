@@ -1,9 +1,7 @@
 #include "Arduino.h"
 #include "WhaleController.h"
 
-int currState;
 bool stateChanged;
-
 
 #define LDR_TRIGGERVALUE 700 //the higher the darker
 WhaleController *whaleControllerInstance;
@@ -21,13 +19,14 @@ void WhaleController::init(){
   whaleRTC.init();
   whaleFSM.init();
   stopEmotionsTime = 0;
-  currState = 0;
   stateChanged = false;
   nextEmotion = 0;
   nextDuration = 1000;
   antiBounceDuration = millis();
   //BLUETOOTH
   Serial3.begin(9600);
+  whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
+  setEmotion(6, 10000);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
@@ -44,9 +43,10 @@ void WhaleController::buttonHandler(){
 	if(millis() - 1000 > antiBounceDuration){
 		antiBounceDuration = millis();
 		Serial.println(whaleRTC.getBedTimeMinute());
+		stateChanged = true;
+		whaleFSM.buttonPressed(&nextEmotion, &nextDuration);
 	}
-	// stateChanged = true;
-	// whaleFSM.buttonPressed(&nextEmotion, &nextDuration);
+	
 	// currState++;
 	// if(currState > 6){
 	//     currState = 0;
@@ -117,10 +117,8 @@ void WhaleController::routine(){
 	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
 	    if (pirState == LOW) {
 	      // we have just turned on
-	      	// whaleFSM.motionDetected();
-			// stateChanged = true;
-			// whaleFSM.motionDetected(&nextEmotion, &nextDuration);
-			// Serial.println(nextEmotion);
+			stateChanged = true;
+			whaleFSM.motionDetected(&nextEmotion, &nextDuration);
 	      // We only want to print on the output change, not state
 	      	pirState = HIGH;
 	    }
@@ -135,7 +133,6 @@ void WhaleController::routine(){
 	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
 		stateChanged = true;
 		whaleFSM.lightOff(&nextEmotion, &nextDuration);
-		whaleRTC.setBedTimeMinute(45);
 	}
 }
 
@@ -155,8 +152,8 @@ void WhaleController::secondaryRoutine(){
 
 	//check bed and wakeup times
 	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
-	    whaleFSM.setGlobalState(100);
+	    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
 	}else if(false){
-		whaleFSM.setGlobalState(101);
+		whaleFSM.setGlobalState(101, &nextEmotion, &nextDuration);
 	}
 }
