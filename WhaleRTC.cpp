@@ -20,9 +20,15 @@ void WhaleRTC::init(){
   if (! rtc.initialized()) {
     Serial.println("RTC has not been initialized and thus is NOT running!");
     // following line sets the RTC to the date & time from the computer the sketch comes from
-    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+	rtc.adjust(DateTime(2018, 6, 28, 0, 0, 0));
     Serial.flush();
   }
+}
+
+void WhaleRTC::setCurrTime(byte h, byte m)
+{
+	rtc.adjust(DateTime(2018, 6, 28, h, m, 0));
 }
 
 byte WhaleRTC::getCurrHour(){

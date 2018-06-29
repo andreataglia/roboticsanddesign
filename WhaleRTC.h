@@ -8,6 +8,7 @@ class WhaleRTC
   public:
     WhaleRTC();
     void init();
+	void setCurrTime(byte, byte);
     byte getCurrMinute();
     byte getCurrHour();
 	void setBedTimeHour(byte);

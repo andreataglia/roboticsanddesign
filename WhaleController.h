@@ -40,6 +40,7 @@ class WhaleController
     void initLdr(int);
     void routine();
     void secondaryRoutine();
+    void bluetoothRoutine();
   private:
     void stopEmotions();
     int btn_pin;

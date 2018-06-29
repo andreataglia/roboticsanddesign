@@ -25,6 +25,9 @@ void WhaleController::init(){
   antiBounceDuration = millis();
   //BLUETOOTH
   Serial3.begin(9600);
+  Serial3.println("Press enter to begin the setup!");
+  delay(1000);
+  Serial3.setTimeout(30000); // Timeout for waiting for command from the user.
   initButton(PUSHBUTTON_PIN);
   initPir(PIR_PIN);
   //set the whale to stay off
@@ -135,20 +138,170 @@ void WhaleController::routine(){
 	}
 }
 
-void WhaleController::secondaryRoutine(){
+void WhaleController::bluetoothRoutine(){
+	//ON THE CELLPHONE TERMINAL, THE ENTER KEY MUST SEND \r\n
+	
 	//check bluetooth data in
 	if (Serial3.available()){
 	   	String data = Serial3.readStringUntil('\n'); 
+		int temp, temp2;
 		if(data != NULL){	
-			Serial3.println("ciao! 1:set bed time, 2: set wakeup time, 3: show bedtime, 4:show wakeup time");
-	   		Serial3.println(data);
-	   		if(data=="1,20\n"){  
-	    		Serial3.println("perfetto");
-	    		// this->setEmotion(4, 2000);
-	   		}
+			Serial3.println("Hello!\r\n");
+			
+			while(1) // Just to be possible to break the setup cycle at any time.
+			{
+				Serial3.println("\r\nPlease choose what you want to do(Just type the number and than press enter):\r\n\n1: Set current time\r\n2: Set bed time\r\n3: Set wake-up time\r\n4: Show current time\r\n5: Show bedtime\r\n6: Show wake-up time\r\n7: Leave\r\n");
+				data = Serial3.readStringUntil('\n');
+				
+				if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+				{
+					Serial3.println("Sorry, I'm leaving the setup...");
+					break;
+				}
+				if(data=="1\r"){ //Current time setup
+					Serial3.println("Please, type the hour and than, press enter\r\n");
+					data = Serial3.readStringUntil('\n');
+				
+					if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+					{
+						Serial3.println("Sorry, I'm leaving the setup...");
+						break;
+					}
+					temp = data.toInt();
+					
+					if(temp >= 0 && temp < 24)
+					{
+						Serial3.println("Please, type the minute and than, press enter\r\n");
+						data = Serial3.readStringUntil('\n');
+					
+						if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+						{
+							Serial3.println("Sorry, I'm leaving the setup...");
+							break;
+						}
+						temp2 = data.toInt();
+						
+						if(temp2 >= 0 && temp2 < 60)
+						{
+							whaleRTC.setCurrTime((byte)temp, (byte)temp2);
+							Serial3.println("Time adjusted correctly!\r\n");
+						}
+						else
+						{
+							Serial3.println("Invalid number!\r\n");					
+						}
+					}
+					else
+					{
+						Serial3.println("Invalid number!\r\n");					
+					}
+						
+				}
+				else if(data=="2\r"){ //Bedtime setup
+					Serial3.println("Please, type the hour and than, press enter\r\n");
+					data = Serial3.readStringUntil('\n');
+				
+					if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+					{
+						Serial3.println("Sorry, I'm leaving the setup...");
+						break;
+					}
+					temp = data.toInt();
+					
+					if(temp >= 0 && temp < 24)
+					{
+						whaleRTC.setBedTimeHour((byte)temp); 
+						
+						Serial3.println("Please, type the minute and than, press enter\r\n");
+						data = Serial3.readStringUntil('\n');
+					
+						if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+						{
+							Serial3.println("Sorry, I'm leaving the setup...");
+							break;
+						}
+						temp = data.toInt();
+						
+						if(temp >= 0 && temp < 60)
+						{
+							whaleRTC.setBedTimeMinute((byte)temp);
+							Serial3.println("Bedtime adjusted correctly!\r\n");
+						}
+						else
+						{
+							Serial3.println("Invalid number!\r\n");					
+						}
+					}
+					else
+					{
+						Serial3.println("Invalid number!\r\n");					
+					}
+					
+				}
+				else if(data=="3\r"){  //Wake-up time setup
+				
+					Serial3.println("Please, type the hour and than, press enter\r\n");
+					data = Serial3.readStringUntil('\n');
+				
+					if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+					{
+						Serial3.println("Sorry, I'm leaving the setup...");
+						break;
+					}
+					temp = data.toInt();
+					
+					if(temp >= 0 && temp < 24)
+					{
+						whaleRTC.setWakeupTimeHour((byte)temp); 
+						
+						Serial3.println("Please, type the minute and than, press enter\r\n");
+						data = Serial3.readStringUntil('\n');
+					
+						if(data.indexOf('\r') == -1) //If the user doesn't type anything within the timeout
+						{
+							Serial3.println("Sorry, I'm leaving the setup...");
+							break;
+						}
+						temp = data.toInt();
+						
+						if(temp >= 0 && temp < 60)
+						{
+							whaleRTC.setWakeupTimeMinute((byte)temp);
+							Serial3.println("Wake-up time adjusted correctly!\r\n");
+						}
+						else
+						{
+							Serial3.println("Invalid number!\r\n");					
+						}
+					}
+					else
+					{
+						Serial3.println("Invalid number!\r\n");					
+					}
+				}
+				else if(data=="4\r"){  //Get current time
+					Serial3.println("The current time is: " + String(whaleRTC.getCurrHour()) + ":" + String(whaleRTC.getCurrMinute()) + "\r\n");		
+				}
+				else if(data=="5\r"){  //Get bed time
+					Serial3.println("The current bedtime is at: " + String(whaleRTC.getBedTimeHour()) + ":" + String(whaleRTC.getBedTimeMinute()) + "\r\n");
+				}
+				else if(data=="6\r"){  //Get wake-up time
+					Serial3.println("The current wake-up time is at: " + String(whaleRTC.getWakeupTimeHour()) + ":" + String(whaleRTC.getWakeupTimeMinute()) + "\r\n");
+				}
+				else if(data=="7\r"){  //Leave the setup  
+					break;
+				}
+				else
+					Serial3.println("Invalid number!\r\n");	
+					
+			}
+			
+			Serial3.println("Bye bye!");
 		}
 	}
+}
 
+void WhaleController::secondaryRoutine(){
 	//check bed and wakeup times
 	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
 	    emotionChanged = true;

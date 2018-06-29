@@ -13,9 +13,13 @@ void setup() {
 }
 
 void loop() {
+  whaleController.secondaryRoutine();
 	for(int i=0; i<60; i++){
-  		delay(1000);
-  		whaleController.routine();
+		for(int j = 0; j < 10; j++)
+		{
+			delay(1000);
+			whaleController.routine();
+		}
+		whaleController.bluetoothRoutine();
 	}
-	whaleController.secondaryRoutine();
 }
