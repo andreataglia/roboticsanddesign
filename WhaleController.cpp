@@ -18,41 +18,46 @@ void WhaleController::init(){
   whaleSound.init();
   whaleRTC.init();
   whaleFSM.init();
+
   stopEmotionsTime = 0;
   emotionChanged = false;
   nextEmotion = 0;
   nextDuration = 1000;
   antiBounceDuration = millis();
+
   //BLUETOOTH
   Serial3.begin(9600);
   Serial3.println("Press enter to begin the setup!");
   delay(1000);
   Serial3.setTimeout(30000); // Timeout for waiting for command from the user.
+  
   initButton(PUSHBUTTON_PIN);
   initPir(PIR_PIN);
+  
   //set the whale to stay off
-  // whaleFSM.setGlobalState(102, &nextEmotion, &nextDuration);
-  // setEmotion(0, 100000);
-  // //DEBUG ONLY
+  whaleFSM.setGlobalState(102, &nextEmotion, &nextDuration);
+  
+  //DEBUG ONLY
   // delay(3000);
-  emotionChanged = true;
-  whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
+  // emotionChanged = true;
+  // whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
 
 void buttonChanged(){
+	Serial.println("buttonChanged");
 	cli();
-  	if (whaleControllerInstance){
-    	whaleControllerInstance->buttonHandler();
-  	}
-  	sei();
+  if (whaleControllerInstance){
+    whaleControllerInstance->buttonHandler();
+  }
+  sei();
 }
 
 void WhaleController::buttonHandler(){
 	if(millis() - 1000 > antiBounceDuration){
 		antiBounceDuration = millis();
-		Serial.println(whaleRTC.getBedTimeMinute());
+		Serial.println("enter Button");
 		emotionChanged = true;
 		whaleFSM.buttonPressed(&nextEmotion, &nextDuration);
 	}
@@ -75,7 +80,9 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 	whaleSound.setEmotion(emotion);
 	TIMSK2 = (1 << TOIE2);
 	TIMSK4 = (1 << TOIE4);
+	// Serial.println(millis());
 	this->stopEmotionsTime = millis() + duration;
+	// Serial.println(stopEmotionsTime);
 }
 
 void WhaleController::stopEmotions(){
@@ -100,15 +107,20 @@ void WhaleController::initPir(int pin){
 	// attachInterrupt(digitalPinToInterrupt(this->pir_pin), pirChanged, CHANGE);
 }
 
+
 void WhaleController::routine(){
 	//check if we have to change emotion
+	Serial.println(emotionChanged);
 	if(emotionChanged){
+		Serial.println("enter set emotion");
 		emotionChanged=false;
-	    setEmotion(nextEmotion, nextDuration);
+		Serial.println(emotionChanged);
+	  setEmotion(nextEmotion, nextDuration);
 	}
 
 	//check emotion time has elapsed
 	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
+		Serial.println("enter elapsed");
 		cli();
 	    this->stopEmotions();
 	    emotionChanged=true;
@@ -118,33 +130,53 @@ void WhaleController::routine(){
 
 	//check PIR
 	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
-	    if (pirState == LOW) {
-	      // we have just turned on
+	   if (pirState == LOW) {
+	   	// we have just turned on
+	   	Serial.println("enter pir");
 			emotionChanged = true;
 			whaleFSM.motionDetected(&nextEmotion, &nextDuration);
 	      // We only want to print on the output change, not state
-	      	pirState = HIGH;
-	    }
-	} else {
-	    if (pirState == HIGH){
-	      	// We only want to print on the output change, not state
-	    	pirState = LOW;
-	    }
+	      pirState = HIGH;
+	   }
+	}
+	else {
+	  if (pirState == HIGH){
+	  	// We only want to print on the output change, not state
+	   	pirState = LOW;
+	  }
 	}
 
 	//check LDR
 	if(analogRead(this->ldr_pin) > LDR_TRIGGERVALUE){
+		Serial.println("enter LDR");
 		emotionChanged = true;
 		whaleFSM.lightOff(&nextEmotion, &nextDuration);
 	}
 }
+
+void WhaleController::secondaryRoutine(){
+	//check bed and wakeup times
+	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
+	    Serial.println("enter bed hour");
+	    emotionChanged = true;
+	    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
+	    Serial.println(nextEmotion);
+	}
+	else if(whaleRTC.getCurrHour() == whaleRTC.getWakeupTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getWakeupTimeMinute()){
+		Serial.println("enter wakeup");
+		emotionChanged = true;
+		whaleFSM.setGlobalState(101, &nextEmotion, &nextDuration);
+	}
+	//FSM will be in charge of getting back to OFF state (i.e. 102)
+}
+
 
 void WhaleController::bluetoothRoutine(){
 	//ON THE CELLPHONE TERMINAL, THE ENTER KEY MUST SEND \r\n
 	
 	//check bluetooth data in
 	if (Serial3.available()){
-	   	String data = Serial3.readStringUntil('\n'); 
+	  String data = Serial3.readStringUntil('\n'); 
 		int temp, temp2;
 		if(data != NULL){	
 			Serial3.println("Hello!\r\n");
@@ -300,15 +332,4 @@ void WhaleController::bluetoothRoutine(){
 			Serial3.println("Bye bye!");
 		}
 	}
-}
-
-void WhaleController::secondaryRoutine(){
-	//check bed and wakeup times
-	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
-	    emotionChanged = true;
-	    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
-	}else if(whaleRTC.getCurrHour() == whaleRTC.getWakeupTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getWakeupTimeMinute()){
-		emotionChanged = true;
-		whaleFSM.setGlobalState(101, &nextEmotion, &nextDuration);
-	}//FSM will be in charge of getting back to OFF state (i.e. 102)
 }

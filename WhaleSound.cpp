@@ -27,7 +27,7 @@ void WhaleSound::init(){
   	}
   	Serial.println(F("DFPlayer Mini online."));
   
-  	audioPlayer.volume(20);  //Set volume value. From 0 to 30
+  	audioPlayer.volume(30);  //Set volume value. From 0 to 30
 }
 
 void WhaleSound::setEmotion(short idx){
