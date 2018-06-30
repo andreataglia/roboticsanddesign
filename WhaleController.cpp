@@ -63,14 +63,6 @@ void WhaleController::buttonHandler(){
 	}
 }
 
-// void pirChanged(){
-// 	cli();
-//   	if (whaleControllerInstance){
-//       	whaleControllerInstance->pirHandler();
-//   	}
-//   	sei();
-// }
-
 //////////////////////// Methods ////////////////////////////////////////////////////////
 
 void WhaleController::setEmotion(short emotion, unsigned long int duration){
@@ -80,9 +72,7 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 	whaleSound.setEmotion(emotion);
 	TIMSK2 = (1 << TOIE2);
 	TIMSK4 = (1 << TOIE4);
-	// Serial.println(millis());
 	this->stopEmotionsTime = millis() + duration;
-	// Serial.println(stopEmotionsTime);
 }
 
 void WhaleController::stopEmotions(){
@@ -110,36 +100,34 @@ void WhaleController::initPir(int pin){
 
 void WhaleController::routine(){
 	//check if we have to change emotion
-	Serial.println(emotionChanged);
 	if(emotionChanged){
 		Serial.println("enter set emotion");
 		emotionChanged=false;
-		Serial.println(emotionChanged);
 	  setEmotion(nextEmotion, nextDuration);
 	}
 
 	//check emotion time has elapsed
 	if(this->stopEmotionsTime > 0 && millis() > this->stopEmotionsTime){
-		Serial.println("enter elapsed");
+		Serial.println("enter time elapsed");
 		cli();
-	    this->stopEmotions();
-	    emotionChanged=true;
-	    whaleFSM.emotionIsOver(&nextEmotion, &nextDuration);
+    this->stopEmotions();
+    emotionChanged=true;
+    whaleFSM.emotionIsOver(&nextEmotion, &nextDuration);
 		sei();
 	}
 
 	//check PIR
 	if (digitalRead(this->pir_pin)) { // check if the input is HIGH
-	   if (pirState == LOW) {
+  	if (pirState == LOW) {
 	   	// we have just turned on
 	   	Serial.println("enter pir");
 			emotionChanged = true;
 			whaleFSM.motionDetected(&nextEmotion, &nextDuration);
-	      // We only want to print on the output change, not state
-	      pirState = HIGH;
-	   }
+	    // We only want to print on the output change, not state
+	    pirState = HIGH;
+  	}
 	}
-	else {
+	else{
 	  if (pirState == HIGH){
 	  	// We only want to print on the output change, not state
 	   	pirState = LOW;
@@ -157,10 +145,9 @@ void WhaleController::routine(){
 void WhaleController::secondaryRoutine(){
 	//check bed and wakeup times
 	if(whaleRTC.getCurrHour() == whaleRTC.getBedTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getBedTimeMinute()){
-	    Serial.println("enter bed hour");
-	    emotionChanged = true;
-	    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
-	    Serial.println(nextEmotion);
+    Serial.println("enter bed hour");
+    emotionChanged = true;
+    whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
 	}
 	else if(whaleRTC.getCurrHour() == whaleRTC.getWakeupTimeHour() && whaleRTC.getCurrMinute() == whaleRTC.getWakeupTimeMinute()){
 		Serial.println("enter wakeup");

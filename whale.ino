@@ -15,7 +15,7 @@ void setup() {
 void loop(){
   Serial.println("secondary routine");
   whaleController.secondaryRoutine();
-	for(int i=0; i<55; i++){
+	for(int i=0; i<5; i++){
 		for(int j=0; j<10; j++){
 			delay(1000);
       Serial.println("routine");
