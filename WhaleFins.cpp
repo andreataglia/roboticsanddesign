@@ -1,8 +1,8 @@
 #include "Arduino.h"
 #include "WhaleFins.h"
 
-int durations[] = {2000, 300, 300, 200, 1000, 700, 0};
-int angles[] = {160, 180, 120, 100, 180, 130, 0};
+int durations[] = {0, 350, 300, 200, 1000, 700, 0};
+int angles[] = {0, 180, 120, 100, 180, 130, 0};
 short currEmotionIndex;
 
 Servo servo;
@@ -26,10 +26,13 @@ void WhaleFins::init(int servo_pin){
   currEmotionIndex = 0;
 }
 
-void WhaleFins::setEmotion(short idx)
-{
-    currEmotionIndex = idx;
-  	servo.write(0);   
+void WhaleFins::setEmotion(short idx){
+  currEmotionIndex = idx;
+  servo.write(90);
+}
+
+void WhaleFins::stopFins(){
+  servo.write(90);
 }
 
 ISR(TIMER4_OVF_vect){

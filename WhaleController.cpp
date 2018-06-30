@@ -31,10 +31,10 @@ void WhaleController::init(){
   initButton(PUSHBUTTON_PIN);
   initPir(PIR_PIN);
   //set the whale to stay off
-  whaleFSM.setGlobalState(102, &nextEmotion, &nextDuration);
-  setEmotion(0, 100000);
-  //DEBUG ONLY
-  delay(3000);
+  // whaleFSM.setGlobalState(102, &nextEmotion, &nextDuration);
+  // setEmotion(0, 100000);
+  // //DEBUG ONLY
+  // delay(3000);
   emotionChanged = true;
   whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
 }
@@ -79,6 +79,7 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 }
 
 void WhaleController::stopEmotions(){
+	whaleFins.stopFins();
 	TIMSK2 = (0 << TOIE2);
 	TIMSK4 = (0 << TOIE4);
 }

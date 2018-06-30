@@ -10,6 +10,7 @@ class WhaleFins
     WhaleFins();
     void init(int);
     void setEmotion(short);
+    void stopFins();
   private:
     int _pin;
 };
