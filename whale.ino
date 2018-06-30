@@ -12,11 +12,10 @@ void setup() {
   delay(1000);
 }
 
-void loop() {
+void loop(){
   whaleController.secondaryRoutine();
 	for(int i=0; i<60; i++){
-		for(int j = 0; j < 10; j++)
-		{
+		for(int j = 0; j < 10; j++){
 			delay(1000);
 			whaleController.routine();
 		}
