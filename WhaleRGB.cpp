@@ -10,7 +10,7 @@
 #define TIME_THRESH 50
 #define EXPRESSIONS 7
 //Hardcoded emotion color matrix row dimension
-#define NUMCOLOR 33
+#define NUMCOLOR 28
 #define RGB 3
 
 byte currentColor[RGB] = {0,0,0};
@@ -20,7 +20,7 @@ byte currentColor[RGB] = {0,0,0};
  * Colors are represented by the 3 byte values of Red, Green, Blue 
  */
 byte colors[NUMCOLOR][RGB] = {
-  //Activation
+  //OFF
   {0,0,0},//0
   {0,0,0},//1
   //JOY
@@ -35,47 +35,42 @@ byte colors[NUMCOLOR][RGB] = {
   {130, 255, 0},//10
   //FEAR
   {80,0,100},//11
-  {160,0,255},//12
-  {100,0,150},//13
-  {255,0,255},//14
+  {215,110,230},//12
+  {170,0,255},//13
+  {240,0,140},//14
   //ANGER
   {255,0,0},//15
-  {80,40,0},//16
+  {80,80,0},//16
   {255,0,0},//17
-  {150,20,20},//18
-  //SADNESS
-  {20,20,255},//19
-  {150,170,225},//20
-  {40,60,120},//21
-  {0,0,90},//22
-  {150,170,225},//23
+  {150,50,50},//18
+  //SAD
+  {0,0,255},//19
+  {30,90,225},//20
+  {70,30,165},//21
+  {0,30,120},//22
+  {0,100,225},//23
   //DISGUST
-  {30,90,50},//24
-  {0,220,55},//25
+  {0,60,20},//24
+  {40,200,20},//25
   //NEUTRAL
-  {240,240,240},//26
-  {80,80,80},//27
-  {80,80,80},//28
-  {0,0,0},//29
-  {0,0,0},//30
-  {80,80,80},//31
-  {80,80,80},//32
+  {255,255,255},//26
+  {60,60,60},//27
 };
 int fadeTime[NUMCOLOR] = {
   //off index=0
   10000, 10000,
   //JOY index=2
-  1000,1000,1000,1000,1000,1000,1000,1000,1000,
+  1200,1200,1200,1200,1200,1200,1200,1200,1200,
   //FEAR index=11
-  1000,2000,1500,1000,
+  1500,1500,1500,1500,
   //ANGER index=15
   1500,2500,1500,3000,
-  //SADNESS index=19
-  1000,1500,2000,1000,1500,
+  //SAD index=19
+  3000,2000,3000,2000,3000,
   //DISGUST index=24
-  2500,1000,
+  3500,2000,
   //NEUTRAL index=26
-  5000,1000,1500,3000,1000,1500,3000
+  6000,6000
 };
 
 /**
@@ -83,7 +78,7 @@ int fadeTime[NUMCOLOR] = {
  * Those indexes will be set by the SetEmotion() function.
  */
 byte exprIdxStart[EXPRESSIONS]={0,2,11,15,19,24,26};
-byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25,32};
+byte exprIdxEnd[EXPRESSIONS]={1,10,14,18,23,25,27};
 
 /**
  * In order to easilly change the colors of the individual transitions, this matrix stores all the RGB-step from a color to the next.
@@ -99,7 +94,7 @@ short exprIdx;
 byte i, j, k, dif;
 unsigned long int nexttime;
 unsigned long int duration;
-bool colorReached, activeEmotion;
+bool colorReached;
 
 
 int REDPIN1;
@@ -130,7 +125,6 @@ void WhaleRGB::init(int LED1_R,int LED2_R,int LED2_G,int LED2_B,int LED3_R,int L
   pinMode(BLUEPIN3_1, OUTPUT);
 
   calcDifference();
-  activeEmotion=false;
   nexttime = 50;
 }
 
@@ -141,13 +135,12 @@ void WhaleRGB::setEmotion(short idx){
   for(k=0; k<RGB; k++){
     currentColor[k] = colors[strtTransitionIdx][k];
   }
-  activeEmotion = true;
 }
 
 ISR(TIMER2_OVF_vect){
-  if (activeEmotion && millis() > nexttime){
+  if(millis() > nexttime){
       
-    //RGB write from the previous color
+  	//RGB write from the previous color
     analogWrite(REDPIN1, currentColor[0]);
     analogWrite(REDPIN2, currentColor[0]);
     analogWrite(REDPIN3, currentColor[0]);
@@ -155,7 +148,14 @@ ISR(TIMER2_OVF_vect){
     analogWrite(GREENPIN3_1, currentColor[1]);
     analogWrite(BLUEPIN2, currentColor[2]);
     analogWrite(BLUEPIN3_1, currentColor[2]);
-      
+    
+    //Debug ONLY
+    // Serial.println(currentColor[0]);
+    // Serial.println(currentColor[1]);
+    // Serial.println(currentColor[2]);
+    // Serial.println("-------\n");
+    // Serial.flush();
+
     // Calculate new color for next ISR
     for(k = 0; k < RGB; k++){
       if(currentColor[k] != colors[endTransitionIdx][k]){
@@ -186,8 +186,9 @@ ISR(TIMER2_OVF_vect){
       
       for(k=0; k<RGB; k++){
         currentColor[k] = colors[strtTransitionIdx][k];
-      }      
-    } 
+      }
+    }
+
     nexttime = millis() + TIMESTEP;
   }
 }
