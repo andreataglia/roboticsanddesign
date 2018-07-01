@@ -1,8 +1,16 @@
 #include "Arduino.h"
 #include "WhaleFins.h"
 
-int durations[] = {0, 350, 300, 200, 1000, 700, 0};
-int angles[] = {0, 180, 120, 100, 180, 130, 0};
+// OFF       0
+// JOY       1
+// FEAR      2
+// ANGER     3
+// SAD       4
+// DISGUST   5
+// NEUTRAL   6
+
+int durations[] = {0, 300, 200, 200, 1400, 500, 0};
+int angles[] = {0, 180, 100, 100, 180, 130, 0};
 short currEmotionIndex;
 
 Servo servo;
