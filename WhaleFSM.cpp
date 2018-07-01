@@ -29,12 +29,14 @@
 WhaleFSM::WhaleFSM(){}
 
 void WhaleFSM::init(){
+  emotionChanged = false;
   currGlobalState = IDLESTATE;
   currState = OFF;
 }
 
 
-void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration){
+bool WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration){
+  emotionChanged = false;
   if(currGlobalState == SLEEPSTATE){
 
     switch(currState){
@@ -43,24 +45,28 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
         *nextEmotion = NEUTRAL;
         *nextDuration = 0.5 * MINUTE; //30 sec 
         currState = NEUTRAL_IR;
+        emotionChanged = true;
         break;
       
       case NEUTRAL_IR:
         *nextEmotion = FEAR;
         *nextDuration = 0.25 * MINUTE; //15 sec
         currState = FEAR;
+        emotionChanged = true;
         break;
 
       case NEUTRAL_BTN:
         *nextEmotion = SAD;
         *nextDuration = 0.1 * MINUTE; //12 sec
         currState = SAD;
+        emotionChanged = true;
         break;
 
       case NEUTRAL_LIGHT:
         *nextEmotion = SAD;
         *nextDuration = 0.5 * MINUTE; //30 sec
         currState = SAD;
+        emotionChanged = true;
         break;
 
       case JOY_IR:
@@ -68,32 +74,41 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
         //need to take time from RTC
         *nextDuration = 0.15 * MINUTE; //9 sec
         currState = NEUTRAL_BTN;
+        emotionChanged = true;
         break;
 
       case JOY_BTN:
         *nextEmotion = NEUTRAL;
         *nextDuration = 1 * MINUTE;
         currState = NEUTRAL_LIGHT;
+        emotionChanged = true;
         break;
 
       case SAD:
         *nextEmotion = ANGER;
         *nextDuration = 3 * MINUTE;
         currState = ANGER;
+        emotionChanged = true;
         break;
 
       case ANGER:
         *nextEmotion = ANGER;
         *nextDuration = 3 * MINUTE;
         currState = ANGER;
+        emotionChanged = true;
         break;
 
       case FEAR:
         *nextEmotion = NEUTRAL;
         *nextDuration = 0.5 * MINUTE;
         currState = NEUTRAL_IR;
+        emotionChanged = true;
         break;
     }
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
 
   else if(currGlobalState == WAKEUPSTATE){
@@ -103,30 +118,35 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
         *nextEmotion = JOY;
         *nextDuration = 0.15 * MINUTE;
         currState = JOY_ALARM;
+        emotionChanged = true;
         break;
 
       case JOY_ALARM:
         *nextEmotion = DISGUST;
         *nextDuration = 0.2 * MINUTE;
         currState = DISGUST;
+        emotionChanged = true;
         break;
 
       case NEUTRAL_IR:
         *nextEmotion = ANGER;
         *nextDuration = 3 * MINUTE;
         currState = ANGER;
+        emotionChanged = true;
         break;
 
       case DISGUST:
         *nextEmotion = ANGER;
         *nextDuration = 3 * MINUTE;
         currState = ANGER;
+        emotionChanged = true;
         break;
 
       case ANGER:
         *nextEmotion = ANGER;
         *nextDuration = 3 * MINUTE;
         currState = ANGER;
+        emotionChanged = true;
         break;
 
       case JOY_IR:
@@ -134,61 +154,92 @@ void WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
         *nextDuration = 5 * MINUTE; //Robots has to go off till morning
         currState = OFF;
         currGlobalState == IDLESTATE;
+        emotionChanged = true;
         break;
     }
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
 
   else if(currGlobalState == IDLESTATE){
     *nextEmotion = OFF;
     *nextDuration = 20 * MINUTE; //Robots has to go off till morning
     currState = OFF;
+    emotionChanged = true;
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
 
-  Serial.print("Current State: ");
-  Serial.println(currState);
-  Serial.flush();
+  return emotionChanged;
 }
 
 
-void WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuration){
-	if(currGlobalState == SLEEPSTATE && (currState == NEUTRAL_IR || currState == FEAR)){
+bool WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuration){
+  emotionChanged = false;
+
+  if(currGlobalState == SLEEPSTATE && (currState == NEUTRAL_IR || currState == FEAR)){
     *nextEmotion = JOY;
     *nextDuration = 4000;
   	currState = JOY_IR;
+    emotionChanged = true;
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
 
   else if(currGlobalState == WAKEUPSTATE && currState == NEUTRAL_IR){
     *nextEmotion = JOY;
     *nextDuration = 7000;
     currState = JOY_IR;
+    emotionChanged = true;
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
-  
-  Serial.print("Current State: ");
-  Serial.println(currState);
-  Serial.flush();
+
+  return emotionChanged;
 }
 
 
-void WhaleFSM::lightOff(short* nextEmotion, unsigned long int* nextDuration){
+bool WhaleFSM::lightOff(short* nextEmotion, unsigned long int* nextDuration){
+  emotionChanged = false;
+
   if(currGlobalState == SLEEPSTATE && currState == NEUTRAL_LIGHT){
     *nextEmotion = OFF;
     *nextDuration = 5 * MINUTE; //Robots has to go off till morning
     currState = OFF;
   	currGlobalState == IDLESTATE;
+
+    emotionChanged = true;
+    
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
-  Serial.print("Current State: ");
-  Serial.println(currState);
-  Serial.flush();
+
+  return emotionChanged;
 }
 
 
-void WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration){
+bool WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration){
+  emotionChanged = false;
   if(currGlobalState == SLEEPSTATE){
   	if(currState == NEUTRAL_BTN || currState == SAD || currState == ANGER){
   			*nextEmotion = JOY;
   			*nextDuration = 8000;
   			currState = JOY_BTN;
+        emotionChanged = true;
   	}
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
 
   else if(currGlobalState == WAKEUPSTATE){
@@ -196,22 +247,26 @@ void WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration
       *nextEmotion = NEUTRAL;
       *nextDuration = 1 * MINUTE;
       currState = NEUTRAL_IR;
+      emotionChanged = true;
     }
+
+    Serial.print("Current State: ");
+    Serial.println(currState);
+    Serial.flush();
   }
-  
-  Serial.print("Current State: ");
-  Serial.println(currState);
-  Serial.flush();
+
+  return emotionChanged;
 }
 
 
-void WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration){
+bool WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration){
+  emotionChanged = true;
   currGlobalState = newState;
   
   if(newState == SLEEPSTATE){
-    *nextEmotion = OFF;
-    *nextDuration = 0.1 * MINUTE;
-    currState = OFF;
+    *nextEmotion = ANGER;
+    *nextDuration = 1 * MINUTE;
+    currState = ANGER;
   }
 
   else if(newState == WAKEUPSTATE){
@@ -229,4 +284,6 @@ void WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long 
   Serial.print("Current State: ");
   Serial.println(currState);
   Serial.flush();
+
+  return emotionChanged;
 }

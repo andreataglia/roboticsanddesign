@@ -5,17 +5,18 @@
 
 class WhaleFSM
 {
-  	public:
-	    WhaleFSM();
-	    void init();
-	    void motionDetected(short* nextEmotion, unsigned long int* nextDuration);
-	    void lightOff(short* nextEmotion, unsigned long int* nextDuration);
-	    void buttonPressed(short* nextEmotion, unsigned long int* nextDuration);
-	    void emotionIsOver(short* nextEmotion, unsigned long int* nextDuration);
-	    void setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration);
+  public:
+	  WhaleFSM();
+	  void init();
+    bool motionDetected(short* nextEmotion, unsigned long int* nextDuration);
+    bool lightOff(short* nextEmotion, unsigned long int* nextDuration);
+    bool buttonPressed(short* nextEmotion, unsigned long int* nextDuration);
+    bool emotionIsOver(short* nextEmotion, unsigned long int* nextDuration);
+    bool setGlobalState(short newState, short* nextEmotion, unsigned long int* nextDuration);
 	private:
 		short currState;
 		short currGlobalState;
+		bool emotionChanged;
 };
 
 #endif
