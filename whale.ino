@@ -13,15 +13,15 @@ void setup() {
 }
 
 void loop(){
-  Serial.println("secondary routine");
+//  Serial.println("secondary routine");
   whaleController.secondaryRoutine();
 	for(int i=0; i<5; i++){
-		for(int j=0; j<10; j++){
+		for(int j=0; j<11; j++){
 			delay(1000);
-      Serial.println("routine");
+//      Serial.println("routine");
 			whaleController.routine();
 		}
-    Serial.println("Blue routine");
+//    Serial.println("Blue routine");
 		whaleController.bluetoothRoutine();
 	}
 }

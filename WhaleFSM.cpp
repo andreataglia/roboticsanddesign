@@ -43,21 +43,21 @@ bool WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
       
       case OFF:
         *nextEmotion = NEUTRAL;
-        *nextDuration = 0.5 * MINUTE; //30 sec 
+        *nextDuration = 0.17 * MINUTE; //10 sec 
         currState = NEUTRAL_IR;
         emotionChanged = true;
         break;
       
       case NEUTRAL_IR:
         *nextEmotion = FEAR;
-        *nextDuration = 0.25 * MINUTE; //15 sec
+        *nextDuration = 0.17 * MINUTE; //10 sec
         currState = FEAR;
         emotionChanged = true;
         break;
 
       case NEUTRAL_BTN:
         *nextEmotion = SAD;
-        *nextDuration = 0.1 * MINUTE; //12 sec
+        *nextDuration = 0.17 * MINUTE; //10 sec
         currState = SAD;
         emotionChanged = true;
         break;
@@ -71,29 +71,28 @@ bool WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
 
       case JOY_IR:
         *nextEmotion = NEUTRAL;
-        //need to take time from RTC
-        *nextDuration = 0.15 * MINUTE; //9 sec
+        *nextDuration = 0.25 * MINUTE; //15 sec
         currState = NEUTRAL_BTN;
         emotionChanged = true;
         break;
 
       case JOY_BTN:
         *nextEmotion = NEUTRAL;
-        *nextDuration = 1 * MINUTE;
+        *nextDuration = 0.2 * MINUTE; //12 sec
         currState = NEUTRAL_LIGHT;
         emotionChanged = true;
         break;
 
       case SAD:
         *nextEmotion = ANGER;
-        *nextDuration = 3 * MINUTE;
+        *nextDuration = 2 * MINUTE;
         currState = ANGER;
         emotionChanged = true;
         break;
 
       case ANGER:
         *nextEmotion = ANGER;
-        *nextDuration = 3 * MINUTE;
+        *nextDuration = 2 * MINUTE;
         currState = ANGER;
         emotionChanged = true;
         break;
@@ -116,21 +115,21 @@ bool WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
 
       case OFF:
         *nextEmotion = JOY;
-        *nextDuration = 0.15 * MINUTE;
+        *nextDuration = 0.17 * MINUTE; //10 sec
         currState = JOY_ALARM;
         emotionChanged = true;
         break;
 
       case JOY_ALARM:
         *nextEmotion = DISGUST;
-        *nextDuration = 0.2 * MINUTE;
+        *nextDuration = 0.17 * MINUTE; //10 sec
         currState = DISGUST;
         emotionChanged = true;
         break;
 
       case NEUTRAL_IR:
         *nextEmotion = ANGER;
-        *nextDuration = 3 * MINUTE;
+        *nextDuration = 2 * MINUTE;
         currState = ANGER;
         emotionChanged = true;
         break;
@@ -144,7 +143,7 @@ bool WhaleFSM::emotionIsOver(short* nextEmotion, unsigned long int* nextDuration
 
       case ANGER:
         *nextEmotion = ANGER;
-        *nextDuration = 3 * MINUTE;
+        *nextDuration = 2 * MINUTE;
         currState = ANGER;
         emotionChanged = true;
         break;
@@ -232,7 +231,7 @@ bool WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration
   if(currGlobalState == SLEEPSTATE){
   	if(currState == NEUTRAL_BTN || currState == SAD || currState == ANGER){
   			*nextEmotion = JOY;
-  			*nextDuration = 8000;
+  			*nextDuration = 6000;
   			currState = JOY_BTN;
         emotionChanged = true;
   	}
@@ -245,7 +244,7 @@ bool WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration
   else if(currGlobalState == WAKEUPSTATE){
     if(currState == JOY_ALARM || currState == DISGUST || currState == ANGER){
       *nextEmotion = NEUTRAL;
-      *nextDuration = 1 * MINUTE;
+      *nextDuration = 0.17 * MINUTE; //10 sec
       currState = NEUTRAL_IR;
       emotionChanged = true;
     }
@@ -264,9 +263,9 @@ bool WhaleFSM::setGlobalState(short newState, short* nextEmotion, unsigned long 
   currGlobalState = newState;
   
   if(newState == SLEEPSTATE){
-    *nextEmotion = ANGER;
-    *nextDuration = 1 * MINUTE;
-    currState = ANGER;
+    *nextEmotion = OFF;
+    *nextDuration = 0.1 * MINUTE;
+    currState = OFF;
   }
 
   else if(newState == WAKEUPSTATE){

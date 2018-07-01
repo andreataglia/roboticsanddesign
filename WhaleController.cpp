@@ -42,7 +42,7 @@ void WhaleController::init(){
   
   //DEBUG ONLY
   // delay(3000);
-  emotionChanged = whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
+//  emotionChanged = whaleFSM.setGlobalState(100, &nextEmotion, &nextDuration);
 }
 
 //////////////////////// ISR ////////////////////////////////////////////////////////
