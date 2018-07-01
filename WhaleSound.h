@@ -9,6 +9,7 @@ class WhaleSound
     	WhaleSound();
     	void init();
     	void setEmotion(short);
+    	void stopSound();
 	private:
 };
 

@@ -34,3 +34,7 @@ void WhaleSound::setEmotion(short idx){
 	audioPlayer.play(idx);  //Play mp3 by position
 }
 
+void WhaleSound::stopSound(){
+	audioPlayer.pause();
+}
+
