@@ -182,7 +182,7 @@ bool WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuratio
 
   if(currGlobalState == SLEEPSTATE && (currState == NEUTRAL_IR || currState == FEAR)){
     *nextEmotion = JOY;
-    *nextDuration = 4000;
+    *nextDuration = 8000;
   	currState = JOY_IR;
     emotionChanged = true;
 
@@ -193,7 +193,7 @@ bool WhaleFSM::motionDetected(short* nextEmotion, unsigned long int* nextDuratio
 
   else if(currGlobalState == WAKEUPSTATE && currState == NEUTRAL_IR){
     *nextEmotion = JOY;
-    *nextDuration = 7000;
+    *nextDuration = 8000;
     currState = JOY_IR;
     emotionChanged = true;
 
@@ -231,7 +231,7 @@ bool WhaleFSM::buttonPressed(short* nextEmotion, unsigned long int* nextDuration
   if(currGlobalState == SLEEPSTATE){
   	if(currState == NEUTRAL_BTN || currState == SAD || currState == ANGER){
   			*nextEmotion = JOY;
-  			*nextDuration = 6000;
+  			*nextDuration = 8000;
   			currState = JOY_BTN;
         emotionChanged = true;
   	}
