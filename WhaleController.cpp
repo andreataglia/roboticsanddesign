@@ -77,6 +77,7 @@ void WhaleController::setEmotion(short emotion, unsigned long int duration){
 }
 
 void WhaleController::stopEmotions(){
+	whaleSound.stopSound();
 	whaleFins.stopFins();
 	TIMSK2 = (0 << TOIE2);
 	TIMSK4 = (0 << TOIE4);
